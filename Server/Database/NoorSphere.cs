@@ -1,0 +1,36 @@
+﻿using Database.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace Database
+{
+    public class NoorSphere : DbContext
+    {
+        // Users
+        public DbSet<User> users { get; set; }
+
+        // Profiles and related entities
+        public DbSet<Profile> profiles { get; set; }
+
+        public DbSet<Experience> Experiences { get; set; }
+        public DbSet<Education> education { get; set; }
+        public DbSet<SocialLinks> socialLinks { get; set; }
+
+        // Posts and related entities
+        public DbSet<Post> posts { get; set; }
+        public DbSet<Comment> comments { get; set; }
+        public DbSet<Like> likes { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder options)
+           => options.UseSqlServer("Server = .; DataBase = NoorSphere; User Id = sa; password = sa123456;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30;");
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Create a unique index for the Email field
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+        }
+    }
+}

@@ -1,0 +1,6 @@
+# Ignore build directories
+bin/
+obj/
+
+# Ignore migration files
+Migrations/

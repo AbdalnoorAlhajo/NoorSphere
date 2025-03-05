@@ -1,0 +1,17 @@
+# Ignore build directories
+bin/
+obj/
+Properties/
+
+# Ignore migration files
+Migrations/
+
+# Ignore local configuration files
+appsettings.Development.json
+appsettings.json
+
+# Ignore project-specific user files
+Server.csproj.user
+
+# Ignore HTTP client files
+Server.http
