@@ -11,6 +11,14 @@ namespace Server.Controllers;
 [Route("api/posts")]
 public class PostsController : ControllerBase
 {
+    private readonly NoorSphere _dbApp;
+
+    public PostsController(NoorSphere dbApp)
+    {
+        _dbApp = dbApp;
+    }
+
+
     /// <summary>
     /// Add a new post.
     /// </summary>
@@ -31,16 +39,14 @@ public class PostsController : ControllerBase
             if (string.IsNullOrEmpty(newPost.Name) || string.IsNullOrEmpty(newPost.Text))
                 return BadRequest("Text and Name are required filed.");
 
-            using var dbApp = new NoorSphere();
-
-            var user = await dbApp.users.FindAsync(newPost.UserId);
+            var user = await _dbApp.users.FindAsync(newPost.UserId);
             if (user == null)
                 return NotFound($"User with ID {newPost.UserId} not found.");
 
             newPost.Name = user.Name;
 
-            dbApp.posts.Add(newPost);
-            await dbApp.SaveChangesAsync();
+            _dbApp.posts.Add(newPost);
+            await _dbApp.SaveChangesAsync();
 
             return Ok(newPost);
         }
@@ -65,9 +71,7 @@ public class PostsController : ControllerBase
     {
         try
         {
-            using var dbApp = new Database.NoorSphere();
-
-            var postsList = await dbApp.posts.ToListAsync();
+            var postsList = await _dbApp.posts.ToListAsync();
 
             if (postsList.Count < 1)
                 return NotFound($"Posts are not found.");
@@ -101,20 +105,18 @@ public class PostsController : ControllerBase
             if (string.IsNullOrEmpty(newComment.Name) || string.IsNullOrEmpty(newComment.Text))
                 return BadRequest("Text and Name are required filed.");
 
-            using var dbApp = new NoorSphere();
-
-            var user = await dbApp.users.FindAsync(newComment.UserId);
+            var user = await _dbApp.users.FindAsync(newComment.UserId);
             if (user == null)
                 return NotFound($"User with ID {newComment.UserId} not found.");
 
-            var post = await dbApp.posts.FindAsync(newComment.PostId);
+            var post = await _dbApp.posts.FindAsync(newComment.PostId);
             if (post == null)
                 return NotFound($"Post with ID {newComment.PostId} not found.");
 
             newComment.Name = user.Name;
 
-            dbApp.comments.Add(newComment);
-            await dbApp.SaveChangesAsync();
+            _dbApp.comments.Add(newComment);
+            await _dbApp.SaveChangesAsync();
 
             return Ok(newComment);
         }
@@ -139,9 +141,7 @@ public class PostsController : ControllerBase
     {
         try
         {
-            using var dbApp = new Database.NoorSphere();
-
-            var commentsList = await dbApp.comments.Where(c => c.PostId == PostId).ToListAsync();
+            var commentsList = await _dbApp.comments.Where(c => c.PostId == PostId).ToListAsync();
 
             if (commentsList.Count < 1)
                 return NotFound($"Posts are not found.");

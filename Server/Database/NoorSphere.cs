@@ -5,6 +5,9 @@ namespace Database
 {
     public class NoorSphere : DbContext
     {
+       public NoorSphere(DbContextOptions<NoorSphere> options) : base(options) { }
+
+
         // Users
         public DbSet<User> users { get; set; }
 
@@ -19,9 +22,6 @@ namespace Database
         public DbSet<Post> posts { get; set; }
         public DbSet<Comment> comments { get; set; }
         public DbSet<Like> likes { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-           => options.UseSqlServer("Server = .; DataBase = NoorSphere; User Id = sa; password = sa123456;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30;");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

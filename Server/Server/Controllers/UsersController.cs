@@ -11,6 +11,14 @@ namespace Server.Controllers;
 [Route("api/users")]
 public class UsersController : ControllerBase
 {
+    private readonly NoorSphere _dbUser;
+
+    public UsersController(NoorSphere dbUser)
+    {
+        _dbUser = dbUser;
+    }
+
+
     /// <summary>
     /// Registers a new user by adding them to the database.
     /// </summary>
@@ -28,9 +36,7 @@ public class UsersController : ControllerBase
                 return BadRequest("User data is missing.");
             
 
-            using var dbUser = new NoorSphere();
-
-            var existingUser = await dbUser.users.FirstOrDefaultAsync(u => u.Email == newUser.Email);
+            var existingUser = await _dbUser.users.FirstOrDefaultAsync(u => u.Email == newUser.Email);
             if (existingUser != null)
                 return BadRequest("Email is already takens.");
 
@@ -38,8 +44,8 @@ public class UsersController : ControllerBase
             // This prevents storing plain-text passwords and adds an extra layer of security.
             newUser.PasswordHash = UserService.HashPassword(newUser.PasswordHash);
 
-            dbUser.users.Add(newUser);
-            await dbUser.SaveChangesAsync();
+            _dbUser.users.Add(newUser);
+            await _dbUser.SaveChangesAsync();
 
             return CreatedAtAction(nameof(FindUser), new { id = newUser.Id }, newUser);
         }
@@ -63,10 +69,8 @@ public class UsersController : ControllerBase
     {
         try
         {
-            using var dbUser = new Database.NoorSphere();
-
             // Attempt to find the user by ID
-            var user = await dbUser.users.FindAsync(id);
+            var user = await _dbUser.users.FindAsync(id);
 
             if (user == null)
                 return NotFound($"User with ID {id} not found.");
@@ -91,9 +95,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            using var dbUser = new Database.NoorSphere();
-
-            var usersList = await dbUser.users.ToListAsync();
+            var usersList = await _dbUser.users.ToListAsync();
 
             if (usersList == null)
                 return NotFound($"Users are not found.");
@@ -122,12 +124,10 @@ public class UsersController : ControllerBase
     {
         try
         {
-            using var dbUser = new Database.NoorSphere();
-
             // Attempt to find a user in the database with the provided email and password.
             // Since passwords are stored as hashed values in the database, 
             // we must hash the input password before comparing it with the stored hash to ensure a secure comparison.
-            var user = await dbUser.users.Where
+            var user = await _dbUser.users.Where
                 (b => b.PasswordHash == UserService.HashPassword(password)
                 && b.Email == email).ToListAsync();
 

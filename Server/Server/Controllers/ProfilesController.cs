@@ -10,6 +10,12 @@ namespace Server.Controllers
     [ApiController]
     public class ProfileController : ControllerBase
     {
+        private readonly NoorSphere _dbApp;
+
+        public ProfileController(NoorSphere dbApp)
+        {
+            _dbApp = dbApp;
+        }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -27,15 +33,13 @@ namespace Server.Controllers
                  if (string.IsNullOrEmpty(newProfile.Status))
                     return BadRequest("Status and Skills are required.");
 
-                using var dbProfile = new NoorSphere();
-
                 // Check if the UserId exists in the Users table
-                var userExists = dbProfile.users.FirstOrDefault(u => u.Id == newProfile.UserId);
+                var userExists = _dbApp.users.FirstOrDefault(u => u.Id == newProfile.UserId);
                 if (userExists == null)
                     return NotFound("User with the given UserId does not exist.");
 
-                dbProfile.profiles.Add(newProfile);
-                await dbProfile.SaveChangesAsync();
+                _dbApp.profiles.Add(newProfile);
+                await _dbApp.SaveChangesAsync();
 
                 return CreatedAtAction(nameof(FindProfile), new { id = newProfile.Id }, newProfile);
             }
@@ -61,14 +65,12 @@ namespace Server.Controllers
                 if (string.IsNullOrEmpty(newExperience.Title))
                     return BadRequest("Title is required.");
 
-                using var dbProfile = new NoorSphere();
-
-                var profilerExists = dbProfile.profiles.FirstOrDefault(u => u.Id == newExperience.ProfileId);
+                var profilerExists = _dbApp.profiles.FirstOrDefault(u => u.Id == newExperience.ProfileId);
                 if (profilerExists == null)
                     return NotFound("Profile with the given ProfileId does not exist.");
 
-                dbProfile.Experiences.Add(newExperience);
-                await dbProfile.SaveChangesAsync();
+                _dbApp.Experiences.Add(newExperience);
+                await _dbApp.SaveChangesAsync();
 
                 return Ok(newExperience);
             }
@@ -95,14 +97,12 @@ namespace Server.Controllers
                 if (string.IsNullOrEmpty(newEducation.Degree))
                     return BadRequest("Degree is required.");
 
-                using var dbProfile = new NoorSphere();
-
-                var userExists = dbProfile.profiles.FirstOrDefault(u => u.Id == newEducation.ProfileId);
+                var userExists = _dbApp.profiles.FirstOrDefault(u => u.Id == newEducation.ProfileId);
                 if (userExists == null)
                     return NotFound("Profile with the given ProfileId does not exist.");
 
-                dbProfile.education.Add(newEducation);
-                await dbProfile.SaveChangesAsync();
+                _dbApp.education.Add(newEducation);
+                await _dbApp.SaveChangesAsync();
 
                 return Ok(newEducation);
             }
@@ -125,9 +125,7 @@ namespace Server.Controllers
         {
             try
             {
-                using var dbProfile = new NoorSphere();
-
-                var profilesList = await dbProfile.profiles.ToListAsync();
+                var profilesList = await _dbApp.profiles.ToListAsync();
 
                 if (profilesList.Count < 1)
                     return NotFound($"Profiles are not found.");
@@ -153,9 +151,7 @@ namespace Server.Controllers
         {
             try
             {
-                using var dbProfile = new NoorSphere();
-
-                var experiencesList = await dbProfile.Experiences.Where(b => b.ProfileId == profileID).ToListAsync();
+                var experiencesList = await _dbApp.Experiences.Where(b => b.ProfileId == profileID).ToListAsync();
 
                 if (experiencesList.Count < 1)
                     return NotFound($"profile with ID({profileID}) has no Experience.");
@@ -182,9 +178,7 @@ namespace Server.Controllers
         {
             try
             {
-                using var dbProfile = new NoorSphere();
-
-                var educationList = await dbProfile.education.Where(b => b.ProfileId == profileID).ToListAsync();
+                var educationList = await _dbApp.education.Where(b => b.ProfileId == profileID).ToListAsync();
 
                 if (educationList.Count < 1)
                     return NotFound($"profile with ID({profileID}) has no Experience.");
@@ -212,10 +206,8 @@ namespace Server.Controllers
         {
             try
             {
-                using var dbProfile = new NoorSphere();
-
                 // Attempt to find the profile by ID
-                var profile = await dbProfile.profiles.FindAsync(id);
+                var profile = await _dbApp.profiles.FindAsync(id);
 
                 if (profile == null)
                     return NotFound($"Profile with ID {id} not found.");
