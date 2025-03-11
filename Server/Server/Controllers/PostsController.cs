@@ -1,5 +1,6 @@
 ﻿using Database;
 using Database.Models;
+using Database.Repositories.Interfaces;
 using Database.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,11 +12,13 @@ namespace Server.Controllers;
 [Route("api/posts")]
 public class PostsController : ControllerBase
 {
-    private readonly NoorSphere _dbApp;
+    private readonly IPostAndRelatedEntitiesRepository _postAndRelatedEntities;
+    private readonly IUserRepository _userRepository;
 
-    public PostsController(NoorSphere dbApp)
+    public PostsController(IUserRepository userRepository, IPostAndRelatedEntitiesRepository postAndRelatedEntities)
     {
-        _dbApp = dbApp;
+        _postAndRelatedEntities = postAndRelatedEntities;
+        _userRepository = userRepository;
     }
 
 
@@ -39,16 +42,14 @@ public class PostsController : ControllerBase
             if (string.IsNullOrEmpty(newPost.Name) || string.IsNullOrEmpty(newPost.Text))
                 return BadRequest("Text and Name are required filed.");
 
-            var user = await _dbApp.users.FindAsync(newPost.UserId);
+            var user = await _userRepository.GetUser(newPost.UserId);
             if (user == null)
                 return NotFound($"User with ID {newPost.UserId} not found.");
 
             newPost.Name = user.Name;
 
-            _dbApp.posts.Add(newPost);
-            await _dbApp.SaveChangesAsync();
-
-            return Ok(newPost);
+            var createdPost = await _postAndRelatedEntities.AddPost(newPost);
+            return Ok(createdPost);
         }
 
         catch (Exception er)
@@ -71,7 +72,7 @@ public class PostsController : ControllerBase
     {
         try
         {
-            var postsList = await _dbApp.posts.ToListAsync();
+            var postsList = await _postAndRelatedEntities.GetAllPosts();
 
             if (postsList.Count < 1)
                 return NotFound($"Posts are not found.");
@@ -105,20 +106,19 @@ public class PostsController : ControllerBase
             if (string.IsNullOrEmpty(newComment.Name) || string.IsNullOrEmpty(newComment.Text))
                 return BadRequest("Text and Name are required filed.");
 
-            var user = await _dbApp.users.FindAsync(newComment.UserId);
+            var user = await _userRepository.GetUser(newComment.UserId);
             if (user == null)
                 return NotFound($"User with ID {newComment.UserId} not found.");
 
-            var post = await _dbApp.posts.FindAsync(newComment.PostId);
+            var post = await _postAndRelatedEntities.GetPost(newComment.PostId);
             if (post == null)
                 return NotFound($"Post with ID {newComment.PostId} not found.");
 
             newComment.Name = user.Name;
 
-            _dbApp.comments.Add(newComment);
-            await _dbApp.SaveChangesAsync();
+            var createdComment = await _postAndRelatedEntities.AddComment(newComment);
 
-            return Ok(newComment);
+            return Ok(createdComment);
         }
 
         catch (Exception er)
@@ -141,10 +141,10 @@ public class PostsController : ControllerBase
     {
         try
         {
-            var commentsList = await _dbApp.comments.Where(c => c.PostId == PostId).ToListAsync();
+            var commentsList = await _postAndRelatedEntities.GetAllComments(PostId);
 
             if (commentsList.Count < 1)
-                return NotFound($"Posts are not found.");
+                return NotFound($"Comments are not found.");
 
 
             return Ok(commentsList);

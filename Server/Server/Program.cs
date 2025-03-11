@@ -1,4 +1,6 @@
 using Database;
+using Database.Repositories.Implementaions;
+using Database.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -7,6 +9,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<NoorSphere>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IUserRepository, SQLUserRepository>();
+builder.Services.AddScoped
+    <IPostAndRelatedEntitiesRepository, SQLPostAndRelatedEntitiesRepository>();
+builder.Services.AddScoped
+    <IProfileAndRelatedEntities, SQLProfileAndRelatedEntities>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

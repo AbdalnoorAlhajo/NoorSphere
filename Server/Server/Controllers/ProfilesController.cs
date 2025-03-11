@@ -1,6 +1,4 @@
-﻿using Database;
-using Database.Utils;
-using Microsoft.AspNetCore.Authorization;
+﻿using Database.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,11 +8,14 @@ namespace Server.Controllers
     [ApiController]
     public class ProfileController : ControllerBase
     {
-        private readonly NoorSphere _dbApp;
+        private readonly IUserRepository _userRepository;
+        private readonly IProfileAndRelatedEntities _profileAndRelatedEntities;
 
-        public ProfileController(NoorSphere dbApp)
+        public ProfileController(IUserRepository userRepository
+            , IProfileAndRelatedEntities profileAndRelatedEntities)
         {
-            _dbApp = dbApp;
+            _profileAndRelatedEntities = profileAndRelatedEntities;
+            _userRepository = userRepository;
         }
 
         [HttpPost]
@@ -33,15 +34,12 @@ namespace Server.Controllers
                  if (string.IsNullOrEmpty(newProfile.Status))
                     return BadRequest("Status and Skills are required.");
 
-                // Check if the UserId exists in the Users table
-                var userExists = _dbApp.users.FirstOrDefault(u => u.Id == newProfile.UserId);
+                var userExists = await _userRepository.GetUser(newProfile.UserId);
                 if (userExists == null)
                     return NotFound("User with the given UserId does not exist.");
 
-                _dbApp.profiles.Add(newProfile);
-                await _dbApp.SaveChangesAsync();
-
-                return CreatedAtAction(nameof(FindProfile), new { id = newProfile.Id }, newProfile);
+                var createdProfile = await _profileAndRelatedEntities.AddProfile(newProfile);
+                return CreatedAtAction(nameof(GetProfile), new { id = createdProfile.Id }, createdProfile);
             }
             catch (Exception ex)
             {
@@ -65,14 +63,12 @@ namespace Server.Controllers
                 if (string.IsNullOrEmpty(newExperience.Title))
                     return BadRequest("Title is required.");
 
-                var profilerExists = _dbApp.profiles.FirstOrDefault(u => u.Id == newExperience.ProfileId);
+                var profilerExists = await _profileAndRelatedEntities.GetProfile(newExperience.ProfileId);
                 if (profilerExists == null)
                     return NotFound("Profile with the given ProfileId does not exist.");
 
-                _dbApp.Experiences.Add(newExperience);
-                await _dbApp.SaveChangesAsync();
-
-                return Ok(newExperience);
+                var createdExperience = await _profileAndRelatedEntities.AddExperience(newExperience);
+                return Ok(createdExperience);
             }
             catch (Exception ex)
             {
@@ -97,14 +93,12 @@ namespace Server.Controllers
                 if (string.IsNullOrEmpty(newEducation.Degree))
                     return BadRequest("Degree is required.");
 
-                var userExists = _dbApp.profiles.FirstOrDefault(u => u.Id == newEducation.ProfileId);
-                if (userExists == null)
+                var profilerExists = await _profileAndRelatedEntities.GetProfile(newEducation.ProfileId);
+                if (profilerExists == null)
                     return NotFound("Profile with the given ProfileId does not exist.");
 
-                _dbApp.education.Add(newEducation);
-                await _dbApp.SaveChangesAsync();
-
-                return Ok(newEducation);
+                var createdEducation = await _profileAndRelatedEntities.AddEducation(newEducation);
+                return Ok(createdEducation);
             }
             catch (Exception ex)
             {
@@ -125,7 +119,7 @@ namespace Server.Controllers
         {
             try
             {
-                var profilesList = await _dbApp.profiles.ToListAsync();
+                var profilesList = await _profileAndRelatedEntities.GetAllProfiles();
 
                 if (profilesList.Count < 1)
                     return NotFound($"Profiles are not found.");
@@ -151,7 +145,7 @@ namespace Server.Controllers
         {
             try
             {
-                var experiencesList = await _dbApp.Experiences.Where(b => b.ProfileId == profileID).ToListAsync();
+                var experiencesList = await _profileAndRelatedEntities.GetAllExperiences(profileID);
 
                 if (experiencesList.Count < 1)
                     return NotFound($"profile with ID({profileID}) has no Experience.");
@@ -178,7 +172,7 @@ namespace Server.Controllers
         {
             try
             {
-                var educationList = await _dbApp.education.Where(b => b.ProfileId == profileID).ToListAsync();
+                var educationList = await _profileAndRelatedEntities.GetAllEducation(profileID);
 
                 if (educationList.Count < 1)
                     return NotFound($"profile with ID({profileID}) has no Experience.");
@@ -202,12 +196,12 @@ namespace Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> FindProfile([FromRoute] int id)
+        public async Task<IActionResult> GetProfile([FromRoute] int id)
         {
             try
             {
                 // Attempt to find the profile by ID
-                var profile = await _dbApp.profiles.FindAsync(id);
+                var profile = await _profileAndRelatedEntities.GetProfile(id);
 
                 if (profile == null)
                     return NotFound($"Profile with ID {id} not found.");
@@ -221,166 +215,5 @@ namespace Server.Controllers
         }
 
 
-        //[HttpGet("me")]
-        //[Authorize]
-        //public async Task<IActionResult> GetProfile()
-        //{
-        //    try
-        //    {
-        //        var profile = await _profileService.GetProfileByUserId(User.Identity.Name);
-        //        if (profile == null)
-        //            return BadRequest("There is no profile for this user");
-
-        //        return Ok(profile);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error fetching user profile.");
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
-
-        //[HttpGet]
-        //[Authorize]
-        //public async Task<IActionResult> GetAllProfiles()
-        //{
-        //    try
-        //    {
-        //        var profiles = await _profileService.GetAllProfiles();
-        //        return Ok(profiles);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error fetching profiles.");
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
-
-        //[HttpGet("user/{userId}")]
-        //[Authorize]
-        //public async Task<IActionResult> GetProfileByUserId(string userId)
-        //{
-        //    try
-        //    {
-        //        var profile = await _profileService.GetProfileByUserId(userId);
-        //        if (profile == null)
-        //            return BadRequest("There is no profile for the given user");
-
-        //        return Ok(profile);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error fetching user profile.");
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
-
-        //[HttpDelete]
-        //[Authorize]
-        //public async Task<IActionResult> DeleteProfile()
-        //{
-        //    try
-        //    {
-        //        await _profileService.DeleteProfile(User.Identity.Name);
-        //        await _postService.DeletePostsByUser(User.Identity.Name);
-        //        await _userService.DeleteUser(User.Identity.Name);
-
-        //        return Ok(new { message = "User information is deleted successfully" });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error deleting profile.");
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
-
-        //[HttpPost("upload")]
-        //[Authorize]
-        //public async Task<IActionResult> UploadProfileImage(IFormFile file)
-        //{
-        //    if (file == null)
-        //        return BadRequest("No file uploaded.");
-
-        //    try
-        //    {
-        //        await _profileService.UploadProfileImage(file, User.Identity.Name);
-        //        return Ok(new { message = "File uploaded successfully" });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error uploading profile image.");
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
-
-        //[HttpPut("experience")]
-        //[Authorize]
-        //public async Task<IActionResult> AddExperience([FromBody] ExperienceDto experienceDto)
-        //{
-        //    if (experienceDto == null || string.IsNullOrEmpty(experienceDto.Title) || string.IsNullOrEmpty(experienceDto.Company))
-        //        return BadRequest("Experience Title and Company are required.");
-
-        //    try
-        //    {
-        //        var profile = await _profileService.AddExperience(experienceDto, User.Identity.Name);
-        //        return Ok(profile);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error adding experience.");
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
-
-        //[HttpDelete("experience/{experienceId}")]
-        //[Authorize]
-        //public async Task<IActionResult> DeleteExperience(string experienceId)
-        //{
-        //    try
-        //    {
-        //        var profile = await _profileService.DeleteExperience(experienceId, User.Identity.Name);
-        //        return Ok(profile);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error deleting experience.");
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
-
-        //[HttpPut("education")]
-        //[Authorize]
-        //public async Task<IActionResult> AddEducation([FromBody] EducationDto educationDto)
-        //{
-        //    if (educationDto == null || string.IsNullOrEmpty(educationDto.School) || string.IsNullOrEmpty(educationDto.Degree))
-        //        return BadRequest("Education School and Degree are required.");
-
-        //    try
-        //    {
-        //        var profile = await _profileService.AddEducation(educationDto, User.Identity.Name);
-        //        return Ok(profile);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error adding education.");
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
-
-        //[HttpDelete("education/{educationId}")]
-        //[Authorize]
-        //public async Task<IActionResult> DeleteEducation(string educationId)
-        //{
-        //    try
-        //    {
-        //        var profile = await _profileService.DeleteEducation(educationId, User.Identity.Name);
-        //        return Ok(profile);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error deleting education.");
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
     }
 }

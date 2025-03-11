@@ -1,5 +1,6 @@
 using Database;
 using Database.Models;
+using Database.Repositories.Interfaces;
 using Database.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,11 +12,11 @@ namespace Server.Controllers;
 [Route("api/users")]
 public class UsersController : ControllerBase
 {
-    private readonly NoorSphere _dbUser;
+    private readonly IUserRepository _userRepository;
 
-    public UsersController(NoorSphere dbUser)
+    public UsersController(IUserRepository userRepository)
     {
-        _dbUser = dbUser;
+        _userRepository = userRepository;
     }
 
 
@@ -36,7 +37,7 @@ public class UsersController : ControllerBase
                 return BadRequest("User data is missing.");
             
 
-            var existingUser = await _dbUser.users.FirstOrDefaultAsync(u => u.Email == newUser.Email);
+            var existingUser = await _userRepository.GetUser(newUser.Email);
             if (existingUser != null)
                 return BadRequest("Email is already takens.");
 
@@ -44,10 +45,9 @@ public class UsersController : ControllerBase
             // This prevents storing plain-text passwords and adds an extra layer of security.
             newUser.PasswordHash = UserService.HashPassword(newUser.PasswordHash);
 
-            _dbUser.users.Add(newUser);
-            await _dbUser.SaveChangesAsync();
+            var createdUser = await _userRepository.AddUser(newUser);
+            return CreatedAtAction(nameof(FindUser), new { id = createdUser.Id }, createdUser);
 
-            return CreatedAtAction(nameof(FindUser), new { id = newUser.Id }, newUser);
         }
 
         catch (Exception er)
@@ -70,7 +70,7 @@ public class UsersController : ControllerBase
         try
         {
             // Attempt to find the user by ID
-            var user = await _dbUser.users.FindAsync(id);
+            var user = await _userRepository.GetUser(id);
 
             if (user == null)
                 return NotFound($"User with ID {id} not found.");
@@ -95,7 +95,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var usersList = await _dbUser.users.ToListAsync();
+            var usersList = await _userRepository.GetAllUsers();
 
             if (usersList == null)
                 return NotFound($"Users are not found.");
@@ -127,11 +127,9 @@ public class UsersController : ControllerBase
             // Attempt to find a user in the database with the provided email and password.
             // Since passwords are stored as hashed values in the database, 
             // we must hash the input password before comparing it with the stored hash to ensure a secure comparison.
-            var user = await _dbUser.users.Where
-                (b => b.PasswordHash == UserService.HashPassword(password)
-                && b.Email == email).ToListAsync();
+            var user = await _userRepository.GetUserByCredentials(email, password);
 
-            if (user.Count == 0)
+            if (user == null)
                 return NotFound($"User with the provided credentials was not found.");
 
             return Ok(user);
