@@ -1,4 +1,5 @@
 using Database;
+using Database.Mappings;
 using Database.Repositories.Implementaions;
 using Database.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,8 @@ builder.Services.AddScoped
     <IPostAndRelatedEntitiesRepository, SQLPostAndRelatedEntitiesRepository>();
 builder.Services.AddScoped
     <IProfileAndRelatedEntities, SQLProfileAndRelatedEntities>();
+
+builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

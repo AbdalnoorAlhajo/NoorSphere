@@ -1,4 +1,4 @@
-﻿using Database.Models;
+﻿using Database.Models.Domain;
 
 
 namespace Database.Repositories.Interfaces

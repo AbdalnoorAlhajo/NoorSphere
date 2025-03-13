@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Database.Models
+namespace Database.Models.Domain
 {
     public class Post
     {
@@ -15,7 +15,6 @@ namespace Database.Models
         public string Text { get; set; }
 
         public string? Name { get; set; } // Future enhancement: Remove this property in favor of dynamically fetching the 'Name' related entity (User). 
-
 
         public DateTime Date { get; set; } = DateTime.UtcNow;
 

@@ -1,9 +1,11 @@
 using Database;
-using Database.Models;
+using Database.Models.Domain;
 using Database.Repositories.Interfaces;
 using Database.Utils;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Database.Mappings;
+using AutoMapper;
+using Database.Models.DTOs.User;
 
 namespace Server.Controllers;
 
@@ -13,43 +15,46 @@ namespace Server.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUserRepository _userRepository;
+    private readonly IMapper _mapper;
 
-    public UsersController(IUserRepository userRepository)
+    public UsersController(IUserRepository userRepository, IMapper mapper)
     {
         _userRepository = userRepository;
+        _mapper = mapper;
     }
 
 
     /// <summary>
     /// Registers a new user by adding them to the database.
     /// </summary>
-    /// <param name="newUser">The new user object to be added to the database.</param>
+    /// <param name="newUserDTO">The new user object to be added to the database.</param>
     /// <returns>Returns the user as <see cref="User"/> Object with the assigned ID if operation go will.</returns>
     [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddUser([FromBody] User newUser)
+    public async Task<IActionResult> AddUser([FromBody] AddNewUserDTO newUserDTO)
     {
         try
-        {
-            if (newUser == null)
-                return BadRequest("User data is missing.");
-            
+        {           
+            if(ModelState.IsValid)
+            {
+                var existingUser = await _userRepository.GetUser(newUserDTO.Email);
+                if (existingUser != null)
+                    return BadRequest("Email is already takens.");
 
-            var existingUser = await _userRepository.GetUser(newUser.Email);
-            if (existingUser != null)
-                return BadRequest("Email is already takens.");
+                var newUser = _mapper.Map<User>(newUserDTO);
 
-            // Hash the password before saving it to ensure it is stored securely in the database. 
-            // This prevents storing plain-text passwords and adds an extra layer of security.
-            newUser.PasswordHash = UserService.HashPassword(newUser.PasswordHash);
+                // Hash the password before saving it to ensure it is stored securely in the database. 
+                // This prevents storing plain-text passwords and adds an extra layer of security.
+                newUser.PasswordHash = UserService.HashPassword(newUserDTO.Password);
 
-            var createdUser = await _userRepository.AddUser(newUser);
-            return CreatedAtAction(nameof(FindUser), new { id = createdUser.Id }, createdUser);
-
+                var createdUser = await _userRepository.AddUser(newUser);
+                return CreatedAtAction(nameof(FindUser), new { id = createdUser.Id }, createdUser);
+            }
+            else
+                return BadRequest(ModelState);
         }
-
         catch (Exception er)
         {
             return StatusCode(500, $"Internal server error: {er.Message}");
@@ -60,7 +65,7 @@ public class UsersController : ControllerBase
     /// Retrieves a user by their ID.
     /// </summary>
     /// <param name="id">The ID of the user to retrieve.</param>
-    /// <returns>Returns the user as <see cref="User"/> Object if found, or a 404 error if not.</returns>
+    /// <returns>Returns the user as <see cref="GetUserDTO"/> Object if found, or a 404 error if not.</returns>
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -69,13 +74,12 @@ public class UsersController : ControllerBase
     {
         try
         {
-            // Attempt to find the user by ID
             var user = await _userRepository.GetUser(id);
 
             if (user == null)
                 return NotFound($"User with ID {id} not found.");
 
-            return Ok(user);
+            return Ok(_mapper.Map<GetUserDTO>(user));
         }
         catch (Exception er)
         {
@@ -86,7 +90,7 @@ public class UsersController : ControllerBase
     /// <summary>
     /// Retrieves all users from the database.
     /// </summary>
-    /// <returns>Returns a list of all users as <see cref="User"/> Objects.</returns>
+    /// <returns>Returns a list of all users as <see cref="GetUserDTO"/> Objects.</returns>
     [HttpGet("all")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -100,8 +104,7 @@ public class UsersController : ControllerBase
             if (usersList == null)
                 return NotFound($"Users are not found.");
 
-
-            return Ok(usersList);
+            return Ok(_mapper.Map<List<GetUserDTO>>(usersList));
         }
         catch (Exception er)
         {
@@ -115,7 +118,7 @@ public class UsersController : ControllerBase
     /// </summary>
     /// <param name="email">The user's email.</param>
     /// <param name="password">The user's password.</param>
-    /// <returns>Returns the user details if the credentials match as a <see cref="User"/> Object.</returns>
+    /// <returns>Returns the user details if the credentials match as a <see cref="GetUserDTO"/> Object.</returns>
     [HttpGet("/login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -124,15 +127,12 @@ public class UsersController : ControllerBase
     {
         try
         {
-            // Attempt to find a user in the database with the provided email and password.
-            // Since passwords are stored as hashed values in the database, 
-            // we must hash the input password before comparing it with the stored hash to ensure a secure comparison.
             var user = await _userRepository.GetUserByCredentials(email, password);
 
             if (user == null)
                 return NotFound($"User with the provided credentials was not found.");
 
-            return Ok(user);
+            return Ok(_mapper.Map<GetUserDTO>(user));
         }
         catch (Exception er)
         {

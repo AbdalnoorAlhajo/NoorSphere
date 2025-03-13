@@ -1,5 +1,8 @@
-﻿using Database;
-using Database.Models;
+﻿using AutoMapper;
+using Database;
+using Database.Models.Domain;
+using Database.Models.DTOs.Post;
+using Database.Models.DTOs.PostAndRelatedEntities.Comment;
 using Database.Repositories.Interfaces;
 using Database.Utils;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +17,14 @@ public class PostsController : ControllerBase
 {
     private readonly IPostAndRelatedEntitiesRepository _postAndRelatedEntities;
     private readonly IUserRepository _userRepository;
+    private readonly IMapper _mapper;
 
-    public PostsController(IUserRepository userRepository, IPostAndRelatedEntitiesRepository postAndRelatedEntities)
+    public PostsController(IUserRepository userRepository, IMapper mapper
+        , IPostAndRelatedEntitiesRepository postAndRelatedEntities)
     {
         _postAndRelatedEntities = postAndRelatedEntities;
         _userRepository = userRepository;
+        _mapper = mapper;
     }
 
 
@@ -31,25 +37,26 @@ public class PostsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddPost([FromBody] Post newPost)
+    public async Task<IActionResult> AddPost([FromBody] AddNewPostDTO newPostDTO)
     {
-
         try
         {
-            if (newPost == null)
-                return BadRequest("Post data is missing.");
+            if(ModelState.IsValid)
+            {
 
-            if (string.IsNullOrEmpty(newPost.Name) || string.IsNullOrEmpty(newPost.Text))
-                return BadRequest("Text and Name are required filed.");
+                var user = await _userRepository.GetUser(newPostDTO.UserId);
+                if (user == null)
+                    return NotFound($"User with ID {newPostDTO.UserId} not found.");
 
-            var user = await _userRepository.GetUser(newPost.UserId);
-            if (user == null)
-                return NotFound($"User with ID {newPost.UserId} not found.");
+                newPostDTO.Name = user.Name;
 
-            newPost.Name = user.Name;
+                var newPost = _mapper.Map<Post>(newPostDTO);
 
-            var createdPost = await _postAndRelatedEntities.AddPost(newPost);
-            return Ok(createdPost);
+                var createdPost = await _postAndRelatedEntities.AddPost(newPost);
+                return Ok(createdPost);
+            }
+            else
+                return BadRequest(ModelState);
         }
 
         catch (Exception er)
@@ -63,7 +70,7 @@ public class PostsController : ControllerBase
     /// <summary>
     /// Retrieves all posts from the database.
     /// </summary>
-    /// <returns>Returns a list of all posts as <see cref="Post"/> Objects.</returns>
+    /// <returns>Returns a list of all posts as <see cref="GetPostDTO"/> Objects.</returns>
     [HttpGet("all")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -77,8 +84,7 @@ public class PostsController : ControllerBase
             if (postsList.Count < 1)
                 return NotFound($"Posts are not found.");
 
-
-            return Ok(postsList);
+            return Ok(_mapper.Map<List<GetPostDTO>>(postsList));
         }
         catch (Exception er)
         {
@@ -89,36 +95,36 @@ public class PostsController : ControllerBase
     /// <summary>
     /// Add a new Comment for a specifec post.
     /// </summary>
-    /// <param name="newComment">The new Comment object.</param>
+    /// <param name="newCommentDTO">The new Comment object.</param>
     /// <returns>Returns the Comment as <see cref="Comment"/> Object with the assigned ID if operation go will.</returns>
     [HttpPost("comment")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddComment([FromBody] Comment newComment)
+    public async Task<IActionResult> AddComment([FromBody] AddNewCommentDTO newCommentDTO)
     {
-
         try
         {
-            if (newComment == null)
-                return BadRequest("Comment data is missing.");
+            if(ModelState.IsValid)
+            {
+                var user = await _userRepository.GetUser(newCommentDTO.UserId);
+                if (user == null)
+                    return NotFound($"User with ID {newCommentDTO.UserId} not found.");
 
-            if (string.IsNullOrEmpty(newComment.Name) || string.IsNullOrEmpty(newComment.Text))
-                return BadRequest("Text and Name are required filed.");
+                var post = await _postAndRelatedEntities.GetPost(newCommentDTO.PostId);
+                if (post == null)
+                    return NotFound($"Post with ID {newCommentDTO.PostId} not found.");
 
-            var user = await _userRepository.GetUser(newComment.UserId);
-            if (user == null)
-                return NotFound($"User with ID {newComment.UserId} not found.");
+                newCommentDTO.Name = user.Name;
 
-            var post = await _postAndRelatedEntities.GetPost(newComment.PostId);
-            if (post == null)
-                return NotFound($"Post with ID {newComment.PostId} not found.");
+                var createdComment = await _postAndRelatedEntities.AddComment
+                    (_mapper.Map<Comment>(newCommentDTO));
 
-            newComment.Name = user.Name;
+                return Ok(createdComment);
+            }
+            else
+                return BadRequest(ModelState);
 
-            var createdComment = await _postAndRelatedEntities.AddComment(newComment);
-
-            return Ok(createdComment);
         }
 
         catch (Exception er)
@@ -132,7 +138,7 @@ public class PostsController : ControllerBase
     /// <summary>
     /// Retrieves all comments for a specifec post.
     /// </summary>
-    /// <returns>Returns a list of all comments as <see cref="Comment"/> Objects.</returns>
+    /// <returns>Returns a list of all comments as <see cref="GetCommentDTO"/> Objects.</returns>
     [HttpGet("comments")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -146,14 +152,12 @@ public class PostsController : ControllerBase
             if (commentsList.Count < 1)
                 return NotFound($"Comments are not found.");
 
-
-            return Ok(commentsList);
+            return Ok(_mapper.Map<List<GetCommentDTO>>(commentsList));
         }
         catch (Exception er)
         {
             return StatusCode(500, $"Internal server error: {er.Message}");
         }
     }
-
 
 }

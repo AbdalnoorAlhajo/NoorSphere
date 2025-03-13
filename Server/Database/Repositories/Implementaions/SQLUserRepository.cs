@@ -1,4 +1,4 @@
-﻿using Database.Models;
+﻿using Database.Models.Domain;
 using Database.Repositories.Interfaces;
 using Database.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +27,9 @@ namespace Database.Repositories.Implementaions
             if (user == null)
                 return null;
 
+            // Attempt to find a user in the database with the provided email and password.
+            // Since passwords are stored as hashed values in the database, 
+            // we must hash the input password before comparing it with the stored hash to ensure a secure comparison.
             return UserService.VerifyPassword(password, user.PasswordHash) ? user : null;
         }
 
