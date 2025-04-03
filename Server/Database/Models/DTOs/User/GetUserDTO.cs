@@ -9,7 +9,7 @@ namespace Database.Models.DTOs.User
 {
     public class GetUserDTO
     {
-        public string Name { get; set; }
+        public string UserName { get; set; }
 
         public string Email { get; set; }
 

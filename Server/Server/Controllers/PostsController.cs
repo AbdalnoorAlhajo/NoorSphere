@@ -3,8 +3,10 @@ using Database;
 using Database.Models.Domain;
 using Database.Models.DTOs.Post;
 using Database.Models.DTOs.PostAndRelatedEntities.Comment;
+using Database.Models.DTOs.PostAndRelatedEntities.Post;
 using Database.Repositories.Interfaces;
 using Database.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +15,7 @@ namespace Server.Controllers;
 
 [ApiController]
 [Route("api/posts")]
+[Authorize]
 public class PostsController : ControllerBase
 {
     private readonly IPostAndRelatedEntitiesRepository _postAndRelatedEntities;
@@ -31,7 +34,7 @@ public class PostsController : ControllerBase
     /// <summary>
     /// Add a new post.
     /// </summary>
-    /// <param name="newPost">The new post object to be added to the database.</param>
+    /// <param name="newPostDTO">The new post object to be added to the database.</param>
     /// <returns>Returns the post as <see cref="Post"/> Object with the assigned ID if operation go will.</returns>
     [HttpPost("Post")]
     [ProducesResponseType(StatusCodes.Status201Created)]
@@ -39,26 +42,27 @@ public class PostsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AddPost([FromBody] AddNewPostDTO newPostDTO)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
         try
         {
-            if(ModelState.IsValid)
-            {
+            var UserId = UserService.ExtractUserIDFromToken(Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last());
 
-                var user = await _userRepository.GetUser(newPostDTO.UserId);
-                if (user == null)
-                    return NotFound($"User with ID {newPostDTO.UserId} not found.");
+            if (string.IsNullOrEmpty(UserId))
+                return Unauthorized("User ID is not found in the token.");
 
-                newPostDTO.Name = user.Name;
+            var user = await _userRepository.GetUser(UserId);
+            if (user == null)
+                return NotFound($"User with ID {UserId} not found.");
 
-                var newPost = _mapper.Map<Post>(newPostDTO);
+            var newPost = _mapper.Map<Post>(newPostDTO);
+            newPost.UserId = UserId;
+            newPostDTO.Name = user.UserName;
 
-                var createdPost = await _postAndRelatedEntities.AddPost(newPost);
-                return Ok(createdPost);
-            }
-            else
-                return BadRequest(ModelState);
+            var createdPost = await _postAndRelatedEntities.AddPost(newPost);
+            return Ok(createdPost);
         }
-
         catch (Exception er)
         {
             return StatusCode(500, $"Internal server error: {er.Message}");
@@ -103,28 +107,30 @@ public class PostsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AddComment([FromBody] AddNewCommentDTO newCommentDTO)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
         try
         {
-            if(ModelState.IsValid)
-            {
-                var user = await _userRepository.GetUser(newCommentDTO.UserId);
-                if (user == null)
-                    return NotFound($"User with ID {newCommentDTO.UserId} not found.");
+            var UserId = UserService.ExtractUserIDFromToken(Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last());
 
-                var post = await _postAndRelatedEntities.GetPost(newCommentDTO.PostId);
-                if (post == null)
-                    return NotFound($"Post with ID {newCommentDTO.PostId} not found.");
+            if (string.IsNullOrEmpty(UserId))
+                return Unauthorized("User ID is not found in the token.");
 
-                newCommentDTO.Name = user.Name;
+            var user = await _userRepository.GetUser(UserId);
+            if (user == null)
+                return NotFound($"User with ID {UserId} not found.");
 
-                var createdComment = await _postAndRelatedEntities.AddComment
-                    (_mapper.Map<Comment>(newCommentDTO));
+            var post = await _postAndRelatedEntities.GetPost(newCommentDTO.PostId);
+            if (post == null)
+                return NotFound($"Post with ID {newCommentDTO.PostId} not found.");
 
-                return Ok(createdComment);
-            }
-            else
-                return BadRequest(ModelState);
+            var newComment = _mapper.Map<Comment>(newCommentDTO);
+            newComment.Name = user.UserName;
+            newComment.UserId = UserId;
 
+            var createdComment = await _postAndRelatedEntities.AddComment(newComment);
+            return Ok(createdComment);
         }
 
         catch (Exception er)
@@ -134,6 +140,45 @@ public class PostsController : ControllerBase
 
     }
 
+    /// <summary>
+    /// Like a specifec post.
+    /// </summary>
+    /// <param name="PostId">The post to be liked.</param>
+    /// <returns>Returns <see cref="Like"/> Object with the assigned ID if operation go will.</returns>
+    [HttpPost("like/{PostId}")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Addlike([FromRoute] int PostId)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        try
+        {
+            var UserId = UserService.ExtractUserIDFromToken(Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last());
+
+            if (string.IsNullOrEmpty(UserId))
+                return Unauthorized("User ID is not found in the token.");
+
+            var user = await _userRepository.GetUser(UserId);
+            if (user == null)
+                return NotFound($"User with ID {UserId} not found.");
+
+            var post = await _postAndRelatedEntities.GetPost(PostId);
+            if (post == null)
+                return NotFound($"Post with ID {PostId} not found.");
+
+            var createdLike = await _postAndRelatedEntities.AddLike(new Like { Id = 0, PostId = PostId, UserId = UserId});
+            return Ok(createdLike);
+        }
+
+        catch (Exception er)
+        {
+            return StatusCode(500, $"Internal server error: {er.Message}");
+        }
+
+    }
 
     /// <summary>
     /// Retrieves all comments for a specifec post.

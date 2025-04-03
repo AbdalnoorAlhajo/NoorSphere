@@ -10,8 +10,6 @@ namespace Database.Models.DTOs.ProfileAndRelatedEntities.Profile
 {
     public class AddNewProfileDTO
     {
-        [Required(ErrorMessage = "UserID is Required")]
-        public int UserId { get; set; }
         public string? Company { get; set; }
         public string? Website { get; set; }
         public string? Country { get; set; }

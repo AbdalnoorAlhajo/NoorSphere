@@ -4,13 +4,16 @@ using Database.Models.DTOs.ProfileAndRelatedEntities.Experience;
 using Database.Models.DTOs.ProfileAndRelatedEntities.Profile;
 using Database.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using Database.Utils;
+using Microsoft.AspNetCore.Authorization;
+using Database.Models.Domain;
+using Profile = Database.Models.Domain.Profile;
 
 namespace Server.Controllers
 {
     [Route("api/profiles")]
     [ApiController]
+    [Authorize]
     public class ProfileController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
@@ -25,6 +28,11 @@ namespace Server.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Add a new Profile.
+        /// </summary>
+        /// <param name="newProfileDTO">The new Profile object to be added to the database.</param>
+        /// <returns>Returns the Profile as <see cref="Profile"/> Object with the assigned ID if operation go will.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -32,20 +40,25 @@ namespace Server.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AddProfile([FromBody] AddNewProfileDTO newProfileDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
-                if(ModelState.IsValid)
-                {
-                    var userExists = await _userRepository.GetUser(newProfileDTO.UserId);
-                    if (userExists == null)
-                        return NotFound("User with the given UserId does not exist.");
+                var UserId = UserService.ExtractUserIDFromToken(Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last());
 
-                    var createdProfile = await _profileAndRelatedEntities.AddProfile
-                        (_mapper.Map<Profile>(newProfileDTO));
-                    return CreatedAtAction(nameof(GetProfile), new { id = createdProfile.Id }, createdProfile);
-                }
-                else
-                    return BadRequest(ModelState);
+                if (string.IsNullOrEmpty(UserId))
+                    return Unauthorized("User ID is not found in the token.");
+
+                var userExists = await _userRepository.GetUser(UserId);
+                if (userExists == null)
+                    return NotFound("User with the given UserId does not exist.");
+
+                var newProfile = _mapper.Map<Profile>(newProfileDTO);
+                newProfile.UserId = UserId;
+
+                var createdProfile = await _profileAndRelatedEntities.AddProfile(newProfile);
+                return CreatedAtAction(nameof(GetProfile), new { id = createdProfile.Id }, createdProfile);
             }
             catch (Exception ex)
             {
@@ -53,6 +66,49 @@ namespace Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Update a profile.
+        /// </summary>
+        /// <param name="newProfileDTO">The Updated Profile object to be updated to the database.</param>
+        /// <returns>Returns the updated Profile as <see cref="Profile"/> Object operation go will.</returns>
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateProfile([FromBody] AddNewProfileDTO newProfileDTO)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var UserId = UserService.ExtractUserIDFromToken(Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last());
+
+                if (string.IsNullOrEmpty(UserId))
+                    return Unauthorized("User ID is not found in the token.");
+
+                var userExists = await _userRepository.GetUser(UserId);
+                if (userExists == null)
+                    return NotFound("User with the given UserId does not exist.");
+
+                var UpdatedProfile = _mapper.Map<Profile>(newProfileDTO);
+                UpdatedProfile.UserId = UserId;
+
+                var createdProfile = await _profileAndRelatedEntities.UpdateProfile(UpdatedProfile);
+                return CreatedAtAction(nameof(GetProfile), new { id = createdProfile.Id }, createdProfile);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error " + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Add a new Experience for a specific profile.
+        /// </summary>
+        /// <param name="newExperienceDTO">The new Experience object to be added to the database.</param>
+        /// <returns>Returns the Experience as <see cref="Experience"/> Object with the assigned ID if operation go will.</returns>
         [HttpPost("experience")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -60,20 +116,25 @@ namespace Server.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AddExperience([FromBody] AddNewExperienceDTO newExperienceDTO)
         {
-            try
-            {  
-                if(ModelState.IsValid)
-                {
-                    var profilerExists = await _profileAndRelatedEntities.GetProfile(newExperienceDTO.ProfileId);
-                    if (profilerExists == null)
-                        return NotFound("Profile with the given ProfileId does not exist.");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-                    var createdExperience = await _profileAndRelatedEntities.AddExperience
-                        (_mapper.Map<Experience>(newExperienceDTO));
-                    return Ok(createdExperience);
-                }
-                else
-                    return BadRequest(ModelState);
+            try
+            {
+                var UserId = UserService.ExtractUserIDFromToken(Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last());
+
+                if (string.IsNullOrEmpty(UserId))
+                    return Unauthorized("User ID is not found in the token.");
+
+                var UserProfile = await _profileAndRelatedEntities.GetProfileByUserId(UserId);
+                if (UserProfile == null)
+                    return NotFound("User does not have profile.");
+
+                newExperienceDTO.ProfileId = UserProfile.Id;
+
+                var createdExperience = await _profileAndRelatedEntities.AddExperience
+                    (_mapper.Map<Experience>(newExperienceDTO));
+                return CreatedAtAction(nameof(GetExperiences), new { profileID = createdExperience.ProfileId}, createdExperience);
             }
             catch (Exception ex)
             {
@@ -81,7 +142,11 @@ namespace Server.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Add a new Education for a specific profile.
+        /// </summary>
+        /// <param name="newEducationDTO">The new Education object to be added to the database.</param>
+        /// <returns>Returns the Education as <see cref="Education"/> Object with the assigned ID if operation go will.</returns>
         [HttpPost("Education")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -89,21 +154,25 @@ namespace Server.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AddEducation([FromBody] AddNewEducationDTO newEducationDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             try
             {
-               if( ModelState.IsValid)
-                {
-                    var profilerExists = await _profileAndRelatedEntities.GetProfile(newEducationDTO.ProfileId);
-                    if (profilerExists == null)
-                        return NotFound("Profile with the given ProfileId does not exist.");
+                var UserId = UserService.ExtractUserIDFromToken(Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last());
 
-                    var createdEducation = await _profileAndRelatedEntities.AddEducation
-                        (_mapper.Map<Education>(newEducationDTO));
-                    return Ok(createdEducation);
-                }
-                else
-                    return BadRequest(ModelState);
+                if (string.IsNullOrEmpty(UserId))
+                    return Unauthorized("User ID is not found in the token.");
+
+                var UserProfile = await _profileAndRelatedEntities.GetProfileByUserId(UserId);
+                if (UserProfile == null)
+                    return NotFound("User does not have profile.");
+
+                newEducationDTO.ProfileId = UserProfile.Id;
+
+                var createdEducation = await _profileAndRelatedEntities.AddEducation
+                    (_mapper.Map<Education>(newEducationDTO));
+                return CreatedAtAction(nameof(GetEducation), new { profileID = createdEducation.ProfileId}, createdEducation);
             }
             catch (Exception ex)
             {
@@ -116,7 +185,7 @@ namespace Server.Controllers
         /// Retrieves all profiles from the database.
         /// </summary>
         /// <returns>Returns a list of all profiles as <see cref="GetProfileDTO"/> Objects.</returns>
-        [HttpGet("Profiles")]
+        [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -218,6 +287,35 @@ namespace Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves a profile by their UserID.
+        /// </summary>
+        /// <returns>Returns the profile as <see cref="GetProfileDTO"/> Object if found, or a 404 error if not.</returns>
+        [HttpGet("me")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetMyProfile()
+        {
+            try
+            {
+                var UserId = UserService.ExtractUserIDFromToken(Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last());
 
+                if (string.IsNullOrEmpty(UserId))
+                    return Unauthorized("User ID is not found in the token.");
+
+                var profile = await _profileAndRelatedEntities.GetProfileByUserId(UserId);
+
+                if (profile == null)
+                    return NotFound($"User Do not have a profile.");
+
+                return Ok(_mapper.Map<GetProfileDTO>(profile));
+            }
+            catch (Exception er)
+            {
+                return StatusCode(500, $"Internal server error: {er.Message}");
+            }
+        }
     }
 }

@@ -20,6 +20,12 @@ namespace Database.Repositories.Implementaions
             await _dbApp.SaveChangesAsync();
             return newComment;
         }
+        public async Task<Like> AddLike(Like newLike)
+        {
+            _dbApp.likes.Add(newLike);
+            await _dbApp.SaveChangesAsync();
+            return newLike;
+        }
 
         public async Task<Post> AddPost(Post newPost)
         {
@@ -35,7 +41,10 @@ namespace Database.Repositories.Implementaions
 
         public async Task<List<Post>> GetAllPosts()
         {
-            return await _dbApp.posts.ToListAsync();
+            return await _dbApp.posts
+                .Include(p => p.comments)
+                .Include(p => p.likes)
+                .ToListAsync();
         }
 
         public async Task<Post?> GetPost(int PostID)

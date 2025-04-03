@@ -5,7 +5,6 @@ namespace Database.Models.DTOs.Post
 {
     public class AddNewPostDTO
     {
-        public int UserId { get; set; }
 
         [Required(ErrorMessage = "Text is required")]
         public string Text { get; set; }

@@ -28,7 +28,6 @@ namespace Database.Models.DTOs.ProfileAndRelatedEntities.Education
 
         public string? Description { get; set; }
 
-        [Required(ErrorMessage = "ProfileId is Required")]
         public int ProfileId { get; set; }
     }
 }

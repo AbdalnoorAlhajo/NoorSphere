@@ -10,8 +10,6 @@ namespace Database.Models.DTOs.PostAndRelatedEntities.Comment
 {
     public class AddNewCommentDTO
     {
-        [Required(ErrorMessage = "UserId is required")]
-        public int UserId { get; set; }
 
         [Required(ErrorMessage = "PostId is required")]
         public int PostId { get; set; }

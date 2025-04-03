@@ -27,7 +27,6 @@ namespace Database.Models.DTOs.ProfileAndRelatedEntities.Experience
 
         public string? Description { get; set; }
 
-        [Required(ErrorMessage = "ProfileId is requeried")]
         public int ProfileId { get; set; }
     }
 }

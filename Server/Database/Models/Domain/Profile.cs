@@ -2,13 +2,14 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+namespace Database.Models.Domain;
 public class Profile
 {
     [Key]
     public int Id { get; set; }
 
     [ForeignKey("User")]
-    public int UserId { get; set; }
+    public string UserId { get; set; }
 
     public string? Company { get; set; }
     public string? Website { get; set; }
@@ -22,7 +23,9 @@ public class Profile
     public string Skills { get; set; }
 
     public string? Bio { get; set; }
-
+    public List<Experience> Experiences { get; set; }
+    public List<Education> Educations { get; set; }
+    public SocialLinks SocialLinks { get; set; }
     public DateTime Date { get; set; } = DateTime.UtcNow;
 }
 
@@ -93,3 +96,4 @@ public class SocialLinks
     [ForeignKey("Profile")]
     public int ProfileId { get; set; }
 }
+

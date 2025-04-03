@@ -9,13 +9,16 @@ namespace Database.Models.Domain
         public int Id { get; set; }
 
         [ForeignKey("User")]
-        public int UserId { get; set; }
+        public string UserId { get; set; }
 
         [Required]
         public string Text { get; set; }
 
-        public string? Name { get; set; } // Future enhancement: Remove this property in favor of dynamically fetching the 'Name' related entity (User). 
+        public List<Like> likes { get; set; }
+        public List<Comment> comments { get; set; }
 
+        [Required]
+        public string Name { get; set; }
         public DateTime Date { get; set; } = DateTime.UtcNow;
 
     }
@@ -29,7 +32,7 @@ namespace Database.Models.Domain
         public int PostId { get; set; }
 
         [ForeignKey("User")]
-        public int UserId { get; set; }
+        public string UserId { get; set; }
     }
 
     public class Comment
@@ -38,7 +41,7 @@ namespace Database.Models.Domain
         public int Id { get; set; }
 
         [ForeignKey("User")]
-        public int UserId { get; set; }
+        public string UserId { get; set; }
 
         [ForeignKey("Post")]
         public int PostId { get; set; }
@@ -46,8 +49,8 @@ namespace Database.Models.Domain
         [Required]
         public string Text { get; set; }
 
+        [Required]
         public string Name { get; set; }
-
         public DateTime Date { get; set; } = DateTime.UtcNow;
     }
 }

@@ -17,38 +17,35 @@ namespace Database.Repositories.Implementaions
 
         public async Task<List<User>> GetAllUsers()
         {
-            return await _dbApp.users.ToListAsync();
+            return await _dbApp.Users.ToListAsync();
         }
 
-        public async Task<User?> GetUserByCredentials(string email, string password)
+        public async Task<User?> GetUser(string id)
         {
-            var user  = await _dbApp.users.FirstOrDefaultAsync(b => b.Email == email);
-
-            if (user == null)
-                return null;
-
-            // Attempt to find a user in the database with the provided email and password.
-            // Since passwords are stored as hashed values in the database, 
-            // we must hash the input password before comparing it with the stored hash to ensure a secure comparison.
-            return UserService.VerifyPassword(password, user.PasswordHash) ? user : null;
+            return await _dbApp.Users.FindAsync(id);
         }
 
-        public async Task<User?> GetUser(int id)
+        public async Task<bool> DeleteUser(User user)
         {
-            return await _dbApp.users.FindAsync(id);
-        }
+            using var transcation = _dbApp.Database.BeginTransaction();
 
-        public async Task<User?> GetUser(string email)
-        {
-            return await _dbApp.users.FirstOrDefaultAsync(u => u.Email == email);
-        }
+            try
+            {
+                var posts = await _dbApp.posts.Where(p => p.UserId == user.Id).ToListAsync();
 
-        public async Task<User> AddUser(User newUser)
-        {
-            _dbApp.users.Add(newUser);
-            await _dbApp.SaveChangesAsync();
-            return newUser;
-        }
+                _dbApp.posts.RemoveRange(posts);
+                _dbApp.Users.Remove(user);
 
+                transcation.Commit();
+
+                return await _dbApp.SaveChangesAsync() > 0;
+            }
+            catch(Exception ex)
+            {
+                transcation.Rollback();
+                Console.WriteLine($"Error while deleting user: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

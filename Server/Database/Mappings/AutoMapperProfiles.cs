@@ -1,6 +1,7 @@
 ﻿using Database.Models.Domain;
 using Database.Models.DTOs.Post;
 using Database.Models.DTOs.PostAndRelatedEntities.Comment;
+using Database.Models.DTOs.PostAndRelatedEntities.Post;
 using Database.Models.DTOs.ProfileAndRelatedEntities.Education;
 using Database.Models.DTOs.ProfileAndRelatedEntities.Experience;
 using Database.Models.DTOs.ProfileAndRelatedEntities.Profile;
