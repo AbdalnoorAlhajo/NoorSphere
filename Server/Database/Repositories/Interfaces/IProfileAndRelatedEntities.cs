@@ -1,5 +1,6 @@
 ﻿using Database.Models;
 using Database.Models.Domain;
+using Database.Models.DTOs.ProfileAndRelatedEntities.Profile;
 
 
 namespace Database.Repositories.Interfaces
@@ -9,7 +10,7 @@ namespace Database.Repositories.Interfaces
         Task<Profile> AddProfile(Profile newProfile);
         Task<Profile> UpdateProfile(Profile UpdatedProfile);
 
-        Task<List<Profile>> GetAllProfiles();
+        Task<List<GetProfilesWithName>> GetAllProfiles();
         Task<Profile?> GetProfile(int id);
         Task<Profile?> GetProfileByUserId(string UserId);
 

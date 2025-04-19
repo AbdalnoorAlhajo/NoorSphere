@@ -36,7 +36,7 @@ public class PostsController : ControllerBase
     /// </summary>
     /// <param name="newPostDTO">The new post object to be added to the database.</param>
     /// <returns>Returns the post as <see cref="Post"/> Object with the assigned ID if operation go will.</returns>
-    [HttpPost("Post")]
+    [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -184,11 +184,11 @@ public class PostsController : ControllerBase
     /// Retrieves all comments for a specifec post.
     /// </summary>
     /// <returns>Returns a list of all comments as <see cref="GetCommentDTO"/> Objects.</returns>
-    [HttpGet("comments")]
+    [HttpGet("comments/{PostId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetComments(int PostId)
+    public async Task<IActionResult> GetComments([FromRoute ]int PostId)
     {
         try
         {

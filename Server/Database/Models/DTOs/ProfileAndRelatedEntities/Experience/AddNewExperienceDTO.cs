@@ -27,6 +27,5 @@ namespace Database.Models.DTOs.ProfileAndRelatedEntities.Experience
 
         public string? Description { get; set; }
 
-        public int ProfileId { get; set; }
     }
 }

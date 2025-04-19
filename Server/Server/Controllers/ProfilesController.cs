@@ -48,11 +48,11 @@ namespace Server.Controllers
                 var UserId = UserService.ExtractUserIDFromToken(Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last());
 
                 if (string.IsNullOrEmpty(UserId))
-                    return Unauthorized("User ID is not found in the token.");
+                    return Unauthorized(new { Unauthorized = "User ID is not found in the token." });
 
                 var userExists = await _userRepository.GetUser(UserId);
                 if (userExists == null)
-                    return NotFound("User with the given UserId does not exist.");
+                    return NotFound(new { Unauthorized = "User with the given UserId does not exist." });
 
                 var newProfile = _mapper.Map<Profile>(newProfileDTO);
                 newProfile.UserId = UserId;
@@ -130,10 +130,10 @@ namespace Server.Controllers
                 if (UserProfile == null)
                     return NotFound("User does not have profile.");
 
-                newExperienceDTO.ProfileId = UserProfile.Id;
+                var newExperience = _mapper.Map<Experience>(newExperienceDTO);
+                newExperience.ProfileId = UserProfile.Id;
 
-                var createdExperience = await _profileAndRelatedEntities.AddExperience
-                    (_mapper.Map<Experience>(newExperienceDTO));
+                var createdExperience = await _profileAndRelatedEntities.AddExperience(newExperience);
                 return CreatedAtAction(nameof(GetExperiences), new { profileID = createdExperience.ProfileId}, createdExperience);
             }
             catch (Exception ex)
@@ -147,7 +147,7 @@ namespace Server.Controllers
         /// </summary>
         /// <param name="newEducationDTO">The new Education object to be added to the database.</param>
         /// <returns>Returns the Education as <see cref="Education"/> Object with the assigned ID if operation go will.</returns>
-        [HttpPost("Education")]
+        [HttpPost("education")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -199,7 +199,7 @@ namespace Server.Controllers
                     return NotFound($"Profiles are not found.");
 
 
-                return Ok(_mapper.Map<List<GetProfileDTO>>(profilesList));
+                return Ok(profilesList);
             }
             catch (Exception er)
             {

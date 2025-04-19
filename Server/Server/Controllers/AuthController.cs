@@ -26,7 +26,7 @@ namespace Server.Controllers
         /// <param name="addNewUserDTO">The new user object to be added to the database.</param>
         /// <returns>Returns a token.</returns>
         [HttpPost]
-        [Route("Register")]
+        [Route("register")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -67,7 +67,7 @@ namespace Server.Controllers
         /// <param name="loginDTO">The user object to be logined to the database.</param>
         /// <returns>Returns a token.</returns>
         [HttpPost]
-        [Route("Login")]
+        [Route("login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -1,4 +1,5 @@
 ﻿using Database.Models.Domain;
+using Database.Models.DTOs.ProfileAndRelatedEntities.Profile;
 using Database.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,9 +38,21 @@ namespace Database.Repositories.Implementaions
             return await _dbApp.Experiences.Where(p => p.ProfileId == ProfileId).ToListAsync();
         }
 
-        public async Task<List<Profile>> GetAllProfiles()
+        public async Task<List<GetProfilesWithName>> GetAllProfiles()
         {
-            return await _dbApp.profiles.ToListAsync();
+            var profiles = _dbApp.profiles
+                .Join(
+                _dbApp.Users,
+                profile => profile.UserId,
+                user => user.Id,
+                (profile, user) => new GetProfilesWithName
+                {
+                    ProfileId = profile.Id,
+                    Name = user.UserName,
+                }
+                );
+
+            return await profiles.ToListAsync();
         }
 
         public async Task<Profile> AddProfile(Profile newProfile)
