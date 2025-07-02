@@ -5,8 +5,9 @@ using Database.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Database.Mappings;
 using AutoMapper;
-using Database.Models.DTOs.User;
 using Microsoft.AspNetCore.Authorization;
+using Database.Models.DTOs.UserAndRelatedEntities.User;
+using Database.Models.DTOs.UserAndRelatedEntities.Follow;
 
 namespace Server.Controllers;
 
@@ -27,7 +28,7 @@ public class UsersController : ControllerBase
 
 
     /// <summary>
-    /// Registers a new user by adding them to the database.
+    /// Deletes the current authenticated user.
     /// </summary>
     /// <returns>Returns <see cref="StatusCodes.Status201Created"/> if deleted successfully.</returns>
     [HttpDelete]
@@ -106,6 +107,105 @@ public class UsersController : ControllerBase
             return StatusCode(500, $"Internal server error: {er.Message}");
         }
     }
+
+    /// <summary>
+    /// Add follow to specific user.
+    /// </summary>
+    /// <returns>Returns a follow as <see cref="GetFollowDTO"/> with asigned id.</returns>
+    [HttpPost("follows")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> AddFollow([FromBody] AddNewFollowDTO addNewFollowDTO)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        try
+        {
+            var followedUser = await _userRepository.GetUser(addNewFollowDTO.FollowedUserId);
+
+            if(followedUser == null)
+                return NotFound($"Followed user with ID {addNewFollowDTO.FollowedUserId} not found.");
+
+            var followerUser = await _userRepository.GetUser(addNewFollowDTO.FollowerUserId);
+            if (followerUser == null)
+                return NotFound($"Follower user with ID {addNewFollowDTO.FollowerUserId} not found.");
+
+            if(await _userRepository.IsFollowingExist(addNewFollowDTO.FollowerUserId, addNewFollowDTO.FollowedUserId))
+                return BadRequest($"User with ID {addNewFollowDTO.FollowerUserId} is already following the user with ID {addNewFollowDTO.FollowedUserId}.");
+
+            return Ok(_mapper.Map<Follow>(await _userRepository.AddFollow(addNewFollowDTO)));
+        }
+        catch (Exception er)
+        {
+            return StatusCode(500, $"Internal server error: {er.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Get all follows to specific user.
+    /// </summary>
+    /// <returns>Returns follows as <see cref="GetFollowDTO"/> list.</returns>
+    [HttpGet("follows/me")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetFollows()
+    {
+        try
+        {
+            var UserId = UserService.ExtractUserIDFromToken(Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last());
+
+            if (string.IsNullOrEmpty(UserId))
+                return Unauthorized("User ID is not found in the token.");
+
+            var user = await _userRepository.GetUser(UserId);
+            if (user == null)
+                return NotFound("User with the given UserId does not exist.");
+
+            var UserFollows = await _userRepository.GetAllFollows(user.Id);
+
+            return UserFollows != null ? Ok(_mapper.Map<List<GetFollowDTO>>(UserFollows)) : NotFound($"User with ID {user.Id} does not have follows.");
+
+        }
+        catch (Exception er)
+        {
+            return StatusCode(500, $"Internal server error: {er.Message}");
+        }
+    }
+
+
+    /// <summary>
+    /// Retrieves the number of followers and following for the current user.
+    /// </summary>
+    /// <returns>Returns <see cref="FollowsAndFollwoingDTO"/> with follower and following counts.</returns>
+    [HttpGet("FollowersAndFollwoing")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetFollowsAndFollowers(string userId)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User ID is not found in the token.");
+
+            var user = await _userRepository.GetUser(userId);
+            if (user == null)
+                return NotFound("User does not exist.");
+
+            var stats = await _userRepository.GetFollowsAndFollowers(userId);
+
+            return Ok(stats);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
 
 }
 

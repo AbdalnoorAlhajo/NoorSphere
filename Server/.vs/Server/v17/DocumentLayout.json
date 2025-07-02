@@ -3,8 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{151CC608-71FA-4E2C-8C51-131670F30127}|Database\\Database.csproj|c:\\users\\abdalrahman\\desktop\\projects\\noorsphere\\server\\database\\models\\dtos\\postandrelatedentities\\post\\getpostdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{151CC608-71FA-4E2C-8C51-131670F30127}|Database\\Database.csproj|solutionrelative:database\\models\\dtos\\postandrelatedentities\\post\\getpostdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{151CC608-71FA-4E2C-8C51-131670F30127}|Database\\Database.csproj|c:\\users\\abdalrahman\\desktop\\projects\\noorsphere\\server\\database\\repositories\\implementaions\\sqlprofileandrelatedentities.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{151CC608-71FA-4E2C-8C51-131670F30127}|Database\\Database.csproj|solutionrelative:database\\repositories\\implementaions\\sqlprofileandrelatedentities.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|c:\\users\\abdalrahman\\desktop\\projects\\noorsphere\\server\\server\\controllers\\profilescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|solutionrelative:server\\controllers\\profilescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,24 +18,40 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
             },
             {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "GetPostDTO.cs",
-              "DocumentMoniker": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Database\\Models\\DTOs\\PostAndRelatedEntities\\Post\\GetPostDTO.cs",
-              "RelativeDocumentMoniker": "Database\\Models\\DTOs\\PostAndRelatedEntities\\Post\\GetPostDTO.cs",
-              "ToolTip": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Database\\Models\\DTOs\\PostAndRelatedEntities\\Post\\GetPostDTO.cs",
-              "RelativeToolTip": "Database\\Models\\DTOs\\PostAndRelatedEntities\\Post\\GetPostDTO.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAtAAAAAAAAAA==",
+              "Title": "SQLProfileAndRelatedEntities.cs",
+              "DocumentMoniker": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Database\\Repositories\\Implementaions\\SQLProfileAndRelatedEntities.cs",
+              "RelativeDocumentMoniker": "Database\\Repositories\\Implementaions\\SQLProfileAndRelatedEntities.cs",
+              "ToolTip": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Database\\Repositories\\Implementaions\\SQLProfileAndRelatedEntities.cs",
+              "RelativeToolTip": "Database\\Repositories\\Implementaions\\SQLProfileAndRelatedEntities.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAIoAAAAeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T15:13:33.924Z",
+              "WhenOpened": "2025-06-30T19:22:24.048Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ProfilesController.cs",
+              "DocumentMoniker": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\Controllers\\ProfilesController.cs",
+              "RelativeDocumentMoniker": "Server\\Controllers\\ProfilesController.cs",
+              "ToolTip": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\Controllers\\ProfilesController.cs",
+              "RelativeToolTip": "Server\\Controllers\\ProfilesController.cs",
+              "ViewState": "AgIAAGoBAAAAAAAAAAAWwHcBAABhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-30T19:18:08.12Z"
             }
           ]
         }

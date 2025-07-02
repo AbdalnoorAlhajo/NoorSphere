@@ -1,11 +1,10 @@
-import React from "react";
 import { formatDate } from "../../utils/global";
 
 const Education = ({ education }) => {
   return (
     <div>
       {education?.map((e) => (
-        <div key={e.id} className="container" style={{ position: "relative" }}>
+        <div key={e.id}>
           <p>
             &#127891; {e.current ? "Studies" : "Studied"} <b>{e.degree}</b> of <b>{e.fieldofstudy}</b> at <b>{e.school}</b>
           </p>

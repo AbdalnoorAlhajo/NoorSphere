@@ -1,5 +1,5 @@
 ﻿using Database.Models.Domain;
-using Database.Models.DTOs.User;
+using Database.Models.DTOs.UserAndRelatedEntities.User;
 using Database.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -37,12 +37,20 @@ namespace Server.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
+                var existingUser = await _userManager.FindByEmailAsync(addNewUserDTO.Email);
+                if (existingUser != null)
+                {
+                    return BadRequest(new { Message = "Email is already in use." });
+                }
+
                 var identityUser = new User
                 {
                     Email = addNewUserDTO.Email,
                     UserName = addNewUserDTO.Name,
                     DateCreated = DateTime.UtcNow
                 };
+
+
 
                 var identityResult = await _userManager.CreateAsync(identityUser, addNewUserDTO.Password);
 

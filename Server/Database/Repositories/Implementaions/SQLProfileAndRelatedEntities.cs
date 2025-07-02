@@ -1,5 +1,6 @@
 ﻿using Database.Models.Domain;
 using Database.Models.DTOs.ProfileAndRelatedEntities.Profile;
+using Database.Models.DTOs.UserAndRelatedEntities.Follow;
 using Database.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,21 +39,27 @@ namespace Database.Repositories.Implementaions
             return await _dbApp.Experiences.Where(p => p.ProfileId == ProfileId).ToListAsync();
         }
 
-        public async Task<List<GetProfilesWithName>> GetAllProfiles()
+        public async Task<List<FollowingSuggestionsDTO>> GetAllProfiles(string currentUserId)
         {
-            var profiles = _dbApp.profiles
-                .Join(
-                _dbApp.Users,
-                profile => profile.UserId,
-                user => user.Id,
-                (profile, user) => new GetProfilesWithName
-                {
-                    ProfileId = profile.Id,
-                    Name = user.UserName,
-                }
-                );
+            var followingIds = await _dbApp.follow
+               .Where(f => f.FollowerUserId == currentUserId)
+               .Select(f => f.FollowedUserId)
+               .ToListAsync();
 
-            return await profiles.ToListAsync();
+            var suggestions = await _dbApp.Users
+                .Where(u => u.Id != currentUserId && !followingIds.Contains(u.Id))
+                .Join(
+                    _dbApp.profiles,
+                    user => user.Id,
+                    profile => profile.UserId,
+                    (user, profile) => new FollowingSuggestionsDTO
+                    {
+                        UserId = user.Id,
+                        Name = user.UserName,
+                        AvatarUrl = profile.AvatarUrl
+                    }
+                ).ToListAsync();
+            return suggestions;
         }
 
         public async Task<Profile> AddProfile(Profile newProfile)
@@ -63,7 +70,7 @@ namespace Database.Repositories.Implementaions
         }
         public async Task<Profile> UpdateProfile(Profile UpdatedProfile)
         {
-            var profile = _dbApp.profiles.FindAsync(UpdatedProfile.Id).Result;
+            var profile = await _dbApp.profiles.FirstOrDefaultAsync(p => p.UserId == UpdatedProfile.UserId);
 
             if (profile != null)
             {
@@ -73,12 +80,15 @@ namespace Database.Repositories.Implementaions
                 profile.Bio = UpdatedProfile.Bio;
                 profile.Country = UpdatedProfile.Country;
                 profile.Company = UpdatedProfile.Company;
+                profile.AvatarUrl = UpdatedProfile.AvatarUrl;
+
+                _dbApp.profiles.Update(profile);
+                await _dbApp.SaveChangesAsync();
             }
 
-            _dbApp.profiles.Update(UpdatedProfile);
-            await _dbApp.SaveChangesAsync();
             return UpdatedProfile;
         }
+
         public async Task<Profile?> GetProfile(int id)
         {
             return await _dbApp.profiles.Include(p => p.Educations).Include(p => p.Experiences).FirstOrDefaultAsync(p => p.Id == id);
@@ -88,5 +98,67 @@ namespace Database.Repositories.Implementaions
         {
             return await _dbApp.profiles.Include(p => p.Educations).Include(p => p.Experiences).FirstOrDefaultAsync(p => p.UserId == UserId);
         }
+
+        public async Task<FollowingSuggestionsDTO[]> GetFollowingsSuggestions(string currentUserId)
+        {
+            var followingIds = await _dbApp.follow
+            .Where(f => f.FollowerUserId == currentUserId)
+            .Select(f => f.FollowedUserId)
+            .ToListAsync();
+
+            var suggestions = await _dbApp.Users
+                .Where(u => u.Id != currentUserId && !followingIds.Contains(u.Id))
+                .Join(
+                    _dbApp.profiles,
+                    user => user.Id,
+                    profile => profile.UserId,
+                    (user, profile) => new FollowingSuggestionsDTO
+                    {
+                        UserId = user.Id,
+                        Name = user.UserName,
+                        AvatarUrl = profile.AvatarUrl
+                    }
+                )
+                .Take(3)
+                .ToArrayAsync();
+
+            return suggestions;
+        }
+
+        public async Task<List<FollowingSuggestionsDTO>> GetFollowingsSuggestionsByName(string currentUserId, string Username)
+        {
+            var followingIds = await _dbApp.follow
+             .Where(f => f.FollowerUserId == currentUserId)
+             .Select(f => f.FollowedUserId)
+             .ToListAsync();
+
+            var suggestions = await _dbApp.Users
+                .Where(u => u.Id != currentUserId &&
+                            !followingIds.Contains(u.Id) &&
+                            u.UserName.Contains(Username))
+                        .Join(
+                    _dbApp.profiles,
+                    user => user.Id,
+                    profile => profile.UserId,
+                    (user, profile) => new FollowingSuggestionsDTO
+                    {
+                        UserId = user.Id,
+                        Name = user.UserName,
+                        AvatarUrl = profile.AvatarUrl
+                    }
+                )
+                .ToListAsync();
+
+            return suggestions;
+        }
+
+
+        public async Task<string> GetImageURL(string UserId)
+        {
+            string imageURL = await _dbApp.profiles.Where(p => p.UserId == UserId).Select(p => p.AvatarUrl).FirstOrDefaultAsync();
+
+            return string.IsNullOrEmpty(imageURL) ? "" : imageURL;
+        }
+
     }
 }

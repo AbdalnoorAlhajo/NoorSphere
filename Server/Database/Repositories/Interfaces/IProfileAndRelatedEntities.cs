@@ -1,6 +1,7 @@
 ﻿using Database.Models;
 using Database.Models.Domain;
 using Database.Models.DTOs.ProfileAndRelatedEntities.Profile;
+using Database.Models.DTOs.UserAndRelatedEntities.Follow;
 
 
 namespace Database.Repositories.Interfaces
@@ -10,7 +11,7 @@ namespace Database.Repositories.Interfaces
         Task<Profile> AddProfile(Profile newProfile);
         Task<Profile> UpdateProfile(Profile UpdatedProfile);
 
-        Task<List<GetProfilesWithName>> GetAllProfiles();
+        Task<List<FollowingSuggestionsDTO>> GetAllProfiles(string currentUserId);
         Task<Profile?> GetProfile(int id);
         Task<Profile?> GetProfileByUserId(string UserId);
 
@@ -18,5 +19,11 @@ namespace Database.Repositories.Interfaces
         Task<List<Experience>> GetAllExperiences(int ProfileId);
         Task<Education> AddEducation(Education newEducation);
         Task<List<Education>> GetAllEducation(int ProfileId);
+
+        Task<FollowingSuggestionsDTO[]> GetFollowingsSuggestions(string currentUserId);
+
+        Task<List<FollowingSuggestionsDTO>> GetFollowingsSuggestionsByName(string currentUserId, string Username);
+
+        Task<string> GetImageURL(string UserId);
     }
 }

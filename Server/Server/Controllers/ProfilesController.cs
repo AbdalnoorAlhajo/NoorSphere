@@ -2,6 +2,7 @@
 using Database.Models.DTOs.ProfileAndRelatedEntities.Education;
 using Database.Models.DTOs.ProfileAndRelatedEntities.Experience;
 using Database.Models.DTOs.ProfileAndRelatedEntities.Profile;
+using Database.Models.DTOs.UserAndRelatedEntities.Follow;
 using Database.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Database.Utils;
@@ -48,11 +49,11 @@ namespace Server.Controllers
                 var UserId = UserService.ExtractUserIDFromToken(Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last());
 
                 if (string.IsNullOrEmpty(UserId))
-                    return Unauthorized(new { Unauthorized = "User ID is not found in the token." });
+                    return Unauthorized("User ID is not found in the token.");
 
                 var userExists = await _userRepository.GetUser(UserId);
                 if (userExists == null)
-                    return NotFound(new { Unauthorized = "User with the given UserId does not exist." });
+                    return NotFound("User with the given UserId does not exist.");
 
                 var newProfile = _mapper.Map<Profile>(newProfileDTO);
                 newProfile.UserId = UserId;
@@ -184,7 +185,7 @@ namespace Server.Controllers
         /// <summary>
         /// Retrieves all profiles from the database.
         /// </summary>
-        /// <returns>Returns a list of all profiles as <see cref="GetProfileDTO"/> Objects.</returns>
+        /// <returns>Returns a list of all profiles as <see cref="FollowingSuggestionsDTO"/> Objects.</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -193,7 +194,9 @@ namespace Server.Controllers
         {
             try
             {
-                var profilesList = await _profileAndRelatedEntities.GetAllProfiles();
+                var UserId = UserService.ExtractUserIDFromToken(Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last());
+
+                var profilesList = await _profileAndRelatedEntities.GetAllProfiles(UserId);
 
                 if (profilesList.Count < 1)
                     return NotFound($"Profiles are not found.");
@@ -315,6 +318,98 @@ namespace Server.Controllers
             catch (Exception er)
             {
                 return StatusCode(500, $"Internal server error: {er.Message}");
+            }
+        }
+
+
+        /// <summary>
+        /// Retrieves up to 3 following suggestions for the current user.
+        /// </summary>
+        /// <returns>Returns an array of <see cref="FollowingSuggestionsDTO"/> if found, or appropriate error.</returns>
+        [HttpGet("suggestions")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetFollowingSuggestions()
+        {
+            try
+            {
+                var userId = UserService.ExtractUserIDFromToken(Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last());
+
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized("User ID is not found in the token.");
+
+                var suggestions = await _profileAndRelatedEntities.GetFollowingsSuggestions(userId);
+
+                if (suggestions == null || suggestions.Length == 0)
+                    return NotFound("No follow suggestions found.");
+
+                return Ok(suggestions);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Retrieves up to 3 following suggestions filtered by a partial name for the current user.
+        /// </summary>
+        /// <param name="name">Optional partial name to filter suggestions by.</param>
+        /// <returns>Returns an array of <see cref="FollowingSuggestionsDTO"/> if found, or appropriate error.</returns>
+        [HttpGet("suggestions/search")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetFollowingSuggestionsByName([FromQuery] string name)
+        {
+            try
+            {
+                var userId = UserService.ExtractUserIDFromToken(Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last());
+
+
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized("User ID is not found in the token.");
+
+                var suggestions = await _profileAndRelatedEntities.GetFollowingsSuggestionsByName(userId, name);
+
+                if (suggestions == null || suggestions.Count == 0)
+                    return NotFound("No matching follow suggestions found.");
+
+                return Ok(suggestions);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the avatar image URL for the current user specific user.
+        /// </summary>
+        /// <returns>The avatar image URL if found, or an appropriate error response.</returns>
+        [HttpGet("avatarURL")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAvatarURL()
+        {
+            try
+            {
+                var UserId = UserService.ExtractUserIDFromToken(Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last());
+
+                var avatarUrl = await _profileAndRelatedEntities.GetImageURL(UserId);
+
+                if (string.IsNullOrEmpty(avatarUrl))
+                    return NotFound("Avatar not found for the specified user.");
+
+                return Ok(avatarUrl);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
     }

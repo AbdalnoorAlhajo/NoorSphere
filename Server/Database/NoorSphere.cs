@@ -24,6 +24,9 @@ namespace Database
             }
         }
 
+        // User and related entities
+        public DbSet<Follow> follow { get; set; }
+
         // Profiles and related entities
         public DbSet<Profile> profiles { get; set; }
 
@@ -33,7 +36,10 @@ namespace Database
 
         // Posts and related entities
         public DbSet<Post> posts { get; set; }
-        public DbSet<Comment> comments { get; set; }
+
+        // This is about to be deleted
+        //public DbSet<Comment> comments { get; set; }
+
         public DbSet<Like> likes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -51,6 +57,13 @@ namespace Database
                 .WithMany()
                 .HasForeignKey(p => p.UserId);
 
+            modelBuilder.Entity<Post>()
+                .HasOne<Post>()
+                .WithMany()
+                .HasForeignKey(p => p.PostId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
             // One User has many likes 
             modelBuilder.Entity<Like>()
                 .HasOne<User>()
@@ -63,22 +76,37 @@ namespace Database
                 .WithMany(p => p.likes)
                 .HasForeignKey(l => l.PostId);
 
-            // One Post has many Comments 
-            modelBuilder.Entity<Comment>()
-                .HasOne<Post>()
-                .WithMany(p => p.comments)
-                .HasForeignKey(c => c.PostId);
-
-            // One User has many Comments 
-            modelBuilder.Entity<Comment>()
-                .HasOne<User>()
-                .WithMany()
-                .HasForeignKey(c => c.UserId);
-
             // Unique constraint for UserId and PostId in Likes
             modelBuilder.Entity<Like>()
                 .HasIndex(Like => new { Like.UserId, Like.PostId })
                 .IsUnique();
+
+            modelBuilder.Entity<Follow>()
+                .HasOne(f => f.FollowedUser)
+                .WithMany(f => f.Followers)
+                .HasForeignKey(l => l.FollowedUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Follow>()
+                .HasOne(f => f.FollowerUser)
+                .WithMany(f => f.Followings)
+                .HasForeignKey(l => l.FollowerUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //// comments part is about to be deleted
+
+            //// One Post has many Comments 
+            //modelBuilder.Entity<Comment>()
+            //    .HasOne<Post>()
+            //    .WithMany(p => p.comments)
+            //    .HasForeignKey(c => c.PostId);
+
+            //// One User has many Comments 
+            //modelBuilder.Entity<Comment>()
+            //    .HasOne<User>()
+            //    .WithMany()
+            //    .HasForeignKey(c => c.UserId);
+
         }
     }
 }

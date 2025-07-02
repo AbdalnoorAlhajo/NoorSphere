@@ -14,6 +14,8 @@ namespace Database.Models.DTOs.ProfileAndRelatedEntities.Profile
         public string? Website { get; set; }
         public string? Country { get; set; }
         public string? Location { get; set; }
+        public string? AvatarUrl { get; set; }
+
 
         [Required]
         public string Status { get; set; }

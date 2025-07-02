@@ -1,5 +1,4 @@
-﻿using Database.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Database.Models.Domain;
@@ -15,6 +14,7 @@ public class Profile
     public string? Website { get; set; }
     public string? Country { get; set; }
     public string? Location { get; set; }
+    public string? AvatarUrl { get; set; }
 
     [Required]
     public string Status { get; set; }
@@ -41,6 +41,7 @@ public class Experience
     public string Company { get; set; }
 
     public string? Location { get; set; }
+    
 
     [Required]
     public DateTime From { get; set; }

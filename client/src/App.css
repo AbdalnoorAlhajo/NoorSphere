@@ -1,11 +1,11 @@
 @tailwind utilities;
 
 :root {
-  --secondary-color: rgb(34, 92, 39);
-  --primary-color: rgb(16, 231, 37);
+  --secondary-color: rgb(31, 41, 92);
+  --primary-color: rgb(99, 102, 241);
+  --post-color: rgba(99, 102, 241, 0.1);
   --dark-color: #343a40;
   --light-color: #f4f4f4;
-  --white-color: #fff;
   --danger-color: #ff0000;
 }
 
@@ -20,11 +20,8 @@
 
 .dark-overlay {
   background-color: rgba(0, 0, 0, 0.7);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  width: inherit;
+  height: inherit;
 }
 
 .btn {
@@ -33,8 +30,8 @@
   margin: 10px;
   width: 100px;
   font-size: 18px;
-  border: 0;
-  border-radius: 5px;
+  border: none;
+  border-radius: 10px;
 }
 
 .btn:hover {
@@ -44,9 +41,12 @@
 
 .btn-primary {
   background: var(--primary-color);
-  color: var(--white-color);
+  color: white;
 }
 
+.btn-guest {
+  width: 200px;
+}
 .btn-light {
   background: var(--light-color);
   color: var(--dark-color);
@@ -54,12 +54,12 @@
 
 .btn-dark {
   background: var(--dark-color);
-  color: var(--white-color);
+  color: white;
 }
 
 .btn-danger {
   background: var(--danger-color);
-  color: var(--white-color);
+  color: white;
   width: 180px;
 }
 
@@ -77,25 +77,27 @@ small {
 
 .post {
   position: relative;
-  height: 200px;
-  width: 50%;
+  width: 100%;
+
   box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
-  margin-top: 6%;
+  margin-top: 2%;
   padding: 10px;
 }
 
 .post-card {
-  margin-top: 1%;
-  width: 50%;
-  padding: 5px;
-  box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
+  margin-top: 5%;
+  width: 100%;
+  padding: 10px;
   display: flex;
+  overflow: hidden;
+  padding-right: 50px;
+  border-color: var(--primary-color);
+  border-style: solid;
+  border-radius: 5%;
 }
 
 .post-card div:first-of-type {
-  text-align: center;
-  flex-basis: 15%;
-  margin-right: 5%;
+  margin-right: 4px;
 }
 
 .post-card .comment-count {
@@ -111,16 +113,16 @@ small {
 */
 
 .sidebar {
-  position: absolute;
-  z-index: 1;
+  position: fixed;
   background-image: linear-gradient(var(--primary-color), var(--secondary-color));
+  height: 100vh;
 }
 
 .sidebar a {
   padding: 6px 8px 6px 16px;
   text-decoration: none;
   font-size: 20px;
-  color: var(--white-color);
+  color: white;
   display: block;
 }
 
@@ -144,17 +146,14 @@ small {
   background-image: url("../assets/landing.jpeg");
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
   width: 100vw;
   height: 100vh;
-  position: relative;
 }
 
 .landing-inner {
-  color: var(--white-color);
-  height: 100%;
-  width: 100%;
-  margin: auto;
+  color: white;
+  height: inherit;
+  width: inherit;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -236,6 +235,7 @@ small {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-left: 0px;
   position: "relative";
 }
 
@@ -257,15 +257,14 @@ small {
   color: black;
   font-weight: 700;
   font-size: 16px;
-  letter-spacing: 1px;
   padding: 10px 20px;
-  border-radius: 5px;
+  margin-left: 45px;
+  border-radius: 10px;
   outline: none;
-  box-sizing: border-box;
   border: 2px solid rgba(0, 0, 0, 0.1);
-  margin-left: 46px;
   text-align: left;
-  margin-bottom: 27px;
+  margin-bottom: 20px;
+  display: block;
 }
 
 /* Navbar */
@@ -279,7 +278,7 @@ small {
   top: 0;
   z-index: 1;
   position: absolute;
-  border-bottom: solid 1px var(--white-color);
+  border-bottom: solid 1px white;
   font-family: "Zilla Slab Highlight";
 }
 
@@ -288,7 +287,7 @@ small {
 }
 
 .navbar a {
-  color: var(--white-color);
+  color: white;
   padding: 0.45rem;
   margin: 0 0.25rem;
 }
@@ -324,7 +323,7 @@ ul {
 /* Auth Pages */
 
 .main {
-  background-color: var(--white-color);
+  background-color: white;
   margin: 6rem auto;
   border-radius: 10px;
   padding-top: 40px;
@@ -400,21 +399,7 @@ a {
   text-decoration: none;
 }
 
-@media screen and (max-width: 1200px) {
-  body {
-    margin: 10px;
-  }
-  .container {
-    padding: 5px;
-  }
-  .home-column {
-    width: 100%;
-    padding: 0;
-    margin-bottom: 10%;
-  }
-}
-
-@media screen and (max-width: 1000px) {
+@media screen and (max-width: 1280px) {
   .sidebar {
     display: none;
   }
@@ -422,12 +407,13 @@ a {
     margin-left: 0;
   }
   .post-card {
-    width: 100%;
     margin: 0;
     margin-bottom: 10px;
   }
+  .container {
+    margin-left: 0;
+  }
   .post {
-    width: 100%;
     margin-bottom: 10px;
     margin-top: 50px;
   }

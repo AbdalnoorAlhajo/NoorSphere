@@ -1,7 +1,11 @@
-﻿using Database.Models.Domain;
+﻿using AutoMapper;
+using Database.Models.Domain;
+using Database.Models.DTOs.ProfileAndRelatedEntities.Profile;
+using Database.Models.DTOs.UserAndRelatedEntities.Follow;
 using Database.Repositories.Interfaces;
 using Database.Utils;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics.Internal;
 
 
 namespace Database.Repositories.Implementaions
@@ -9,10 +13,11 @@ namespace Database.Repositories.Implementaions
     public class SQLUserRepository : IUserRepository
     {
         private readonly NoorSphere _dbApp;
-
-        public SQLUserRepository(NoorSphere dbApp)
+        private readonly IMapper _mapper;
+        public SQLUserRepository(NoorSphere dbApp, IMapper mapper)
         {
             _dbApp = dbApp;
+            _mapper = mapper;
         }
 
         public async Task<List<User>> GetAllUsers()
@@ -46,6 +51,35 @@ namespace Database.Repositories.Implementaions
                 Console.WriteLine($"Error while deleting user: {ex.Message}");
                 return false;
             }
+        }
+
+        public async Task<GetFollowDTO> AddFollow(AddNewFollowDTO newFollow)
+        {
+            var follow = _mapper.Map<Follow>(newFollow);
+
+            await _dbApp.follow.AddAsync(follow);
+            await _dbApp.SaveChangesAsync();
+            return _mapper.Map<GetFollowDTO>(follow);
+        }
+
+        public async Task<bool> IsFollowingExist(string followerId, string followedId)
+        {
+            return await _dbApp.follow.AnyAsync(f => f.FollowerUserId == followerId && f.FollowedUserId == followedId);
+        }
+
+        public async Task<List<Follow>> GetAllFollows(string UserID)
+        {
+           return await _dbApp.follow.Where(f => f.FollowedUserId == UserID).ToListAsync();
+
+        }
+
+        public async Task<FollowsAndFollwoingDTO> GetFollowsAndFollowers(string UserID)
+        {
+            return new FollowsAndFollwoingDTO
+            {
+                Followers = await _dbApp.follow.CountAsync(f => f.FollowedUserId == UserID),
+                Following = await _dbApp.follow.CountAsync(f => f.FollowerUserId == UserID)
+            };
         }
     }
 }

@@ -1,3 +1,10 @@
+.vs/
+*.user
+*.suo
+*.vscode/
+*.vs/
+node_modules/
+
 # Ignore build directories
 bin/
 obj/

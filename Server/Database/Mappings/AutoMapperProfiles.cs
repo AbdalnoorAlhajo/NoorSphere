@@ -1,11 +1,11 @@
 ﻿using Database.Models.Domain;
 using Database.Models.DTOs.Post;
-using Database.Models.DTOs.PostAndRelatedEntities.Comment;
 using Database.Models.DTOs.PostAndRelatedEntities.Post;
 using Database.Models.DTOs.ProfileAndRelatedEntities.Education;
 using Database.Models.DTOs.ProfileAndRelatedEntities.Experience;
 using Database.Models.DTOs.ProfileAndRelatedEntities.Profile;
-using Database.Models.DTOs.User;
+using Database.Models.DTOs.UserAndRelatedEntities.Follow;
+using Database.Models.DTOs.UserAndRelatedEntities.User;
 
 namespace Database.Mappings
 {
@@ -17,13 +17,12 @@ namespace Database.Mappings
             CreateMap<User, GetUserDTO>().ReverseMap();
             CreateMap<AddNewUserDTO, User>();
 
+            // Follow
+            CreateMap<Follow, AddNewFollowDTO>().ReverseMap();
+            CreateMap<Follow, GetFollowDTO>().ReverseMap();
             // Post
             CreateMap<AddNewPostDTO, Post>();
             CreateMap<Post, GetPostDTO>().ReverseMap();
-
-            // Comment
-            CreateMap<AddNewCommentDTO, Comment>();
-            CreateMap<Comment, GetCommentDTO>().ReverseMap();
 
             // Profile
             CreateMap<AddNewProfileDTO, Profile>();

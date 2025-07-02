@@ -1,10 +1,9 @@
-import React from "react";
 import { formatDate } from "../../utils/global";
 const Experience = ({ experience }) => {
   return (
     <div>
       {experience?.map((e, index) => (
-        <div key={index} className="container">
+        <div key={index}>
           <p>
             &#128188; {e.current ? "Works" : "Worked"} as <b>{e.title}</b> at <b>{e.company}</b>
           </p>
