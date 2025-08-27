@@ -3,7 +3,7 @@ import Landing from "./components/Landing/Landing";
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbars/Navbar";
 import Login from "./components/Auth/Login";
-import Profile from "./components/Profile/Profile";
+import MyProfile from "./components/Profile/MyProfile";
 import Home from "./components/Posts/Home";
 import Posts from "./components/Posts/Posts";
 import Developers from "./components/Developers/Developers";
@@ -15,6 +15,7 @@ import AddExperience from "./components/Editting/AddExperience";
 import Discussion from "./components/Posts/Discussion";
 import { TokenProvider } from "./components/TokenContext";
 import Explore from "./components/Posts/Explore.";
+import ShowDeveloper from "./components/Developers/ShowDevoloper";
 
 function App() {
   return (
@@ -43,7 +44,7 @@ function App() {
 
         {/* Profile */}
         <Route path="/profile" element={<Home />}>
-          <Route index element={<Profile />} />
+          <Route index element={<MyProfile />} />
           <Route path="edit" element={<EditAccount />} />
           <Route path="addEducation" element={<AddEducation />} />
           <Route path="addExperience" element={<AddExperience />} />
@@ -51,6 +52,9 @@ function App() {
 
         {/* Developer */}
         <Route path="/developers" element={<Developers />}></Route>
+        <Route path="/showDeveloper/:id" element={<Home />}>
+          <Route index element={<ShowDeveloper />} />
+        </Route>
       </Routes>
     </TokenProvider>
   );

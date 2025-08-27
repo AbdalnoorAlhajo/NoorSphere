@@ -118,7 +118,7 @@ const EditAccount = () => {
 
   return (
     <>
-      <div className="ml-[20%] mr-[10%] text-center justify-items-center">
+      <div className="mx-[5%] lg:mx-[10%] text-center justify-items-center">
         <form className="main" onSubmit={handleSubmit}>
           <h1 className="form-title">{HaveProfile.current ? "Edit" : "Create"} Profile</h1>
           <select className="input-style" onChange={(e) => setFormData({ ...formData, status: e.target.value })}>

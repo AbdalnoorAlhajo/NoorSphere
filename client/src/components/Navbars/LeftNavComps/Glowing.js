@@ -18,6 +18,7 @@ const Glowing = () => {
         const trending = await GetTrendingTopics(token);
         setTrendingTopics(trending);
       } catch (error) {
+        setTrendingTopics([]);
         console.log(error);
       }
     };
@@ -25,7 +26,7 @@ const Glowing = () => {
   }, [token]);
 
   return (
-    <div className="border-2 border-solid rounded-xl mb-10 border-[--primary-color]">
+    <div className="border-2 border-solid rounded-xl mb-10 border-[--primary-color] mt-5">
       <div className="flex items-center p-3">
         <svg
           xmlns="http://www.w3.org/2000/svg"

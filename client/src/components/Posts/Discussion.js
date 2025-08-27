@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useToken } from "../TokenContext";
 import Post from "./Post";
 import { SavePost, GetAllComments, GetPostById } from "../../utils/APIs/postService";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { getMyProfile } from "../../utils/APIs/profileService";
 
 const Discussion = () => {
   const { token, decoded } = useToken();
@@ -10,6 +11,9 @@ const Discussion = () => {
   const [comments, setComments] = useState([]);
   const { postId } = useParams();
   const [post, setPost] = useState({});
+  const [posting, setPosting] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const GetAllCommentsById = async () => {
@@ -42,6 +46,28 @@ const Discussion = () => {
   }, [postId, token]);
 
   const OnCommentClick = async () => {
+    setPosting(true);
+
+    const fetchProfile = async () => {
+      return await getMyProfile(token)
+        .then((data) => data)
+        .catch((error) => {
+          if (error.response?.status === 404) {
+            alert("You do not have a profile, please create one before posting.");
+            navigate("/profile/edit");
+          } else {
+            alert("Failed to fetch profile. Please try again.");
+            navigate("/login");
+          }
+        });
+    };
+    const profile = await fetchProfile();
+
+    if (!profile) {
+      setPosting(false);
+      return;
+    }
+
     const requestBody = {
       postId: post.id,
       name: decoded.name,
@@ -60,6 +86,7 @@ const Discussion = () => {
             date: response.date,
             id: response.id,
             likes: response.likes,
+            avatarURL: response.avatarURL,
           },
         ]);
         setInputValue("");
@@ -68,18 +95,7 @@ const Discussion = () => {
         alert(error.message);
       });
 
-    // axios
-    //   .post(`${serverUrl}posts/comment`, requestBody, {
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization: "Bearer " + token,
-    //     },
-    //   })
-    //   .then((response) => {
-    //     setComments((comments) => [...comments, response.data]);
-    //     setInputValue("");
-    //   })
-    //   .catch((error) => console.log(error));
+    setPosting(false);
   };
 
   return (
@@ -97,8 +113,8 @@ const Discussion = () => {
             placeholder="Share your opionion?"
           />
           <div className="relative h-10 mt-2">
-            <button className="btn  btn-primary" style={{ position: "absolute", bottom: 0, right: 0 }} onClick={OnCommentClick}>
-              Comment
+            <button className="btn  btn-primary btn-comment  absolute bottom-0 right-0" onClick={OnCommentClick} disabled={posting}>
+              {posting ? "Commenting..." : "Comment"}
             </button>
           </div>
         </div>

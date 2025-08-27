@@ -112,7 +112,7 @@ export default function Example() {
           </div>
           <div className="flex flex-1 justify-center sm:items-stretch sm:justify-start">
             <div className="flex shrink-0 items-center">
-              <Link className="p-18 text-4xl text-white" to="/home">
+              <Link className="p-18 text-white sm:text-xl md:text-4xl" to="/home">
                 Noorsphere
               </Link>
             </div>

@@ -5,7 +5,8 @@ NoorSphere is a **hands-on social media project** I built to practice and apply 
 ## 🔍 Overview
 
 This simple yet complete social media platform allows users to:
-- ✏️ Create and manage posts  
+- ✏️ Create and manage posts
+- 🤖 Create posts with AI 
 - 👤 Manage their profiles  
 - ➕ Follow other users  
 - 🔍 Explore new developers and content  

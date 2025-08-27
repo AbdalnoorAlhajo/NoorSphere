@@ -12,7 +12,7 @@ namespace Database.Repositories.Interfaces
         Task<Profile> UpdateProfile(Profile UpdatedProfile);
 
         Task<List<FollowingSuggestionsDTO>> GetAllProfiles(string currentUserId);
-        Task<Profile?> GetProfile(int id);
+        Task<Profile?> GetProfile(string id);
         Task<Profile?> GetProfileByUserId(string UserId);
 
         Task<Experience> AddExperience(Experience newExperience);

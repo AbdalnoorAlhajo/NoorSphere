@@ -7,7 +7,6 @@ import { useState } from "react";
 import defaultAvatar from "../../Images/blank-profile-picture.png";
 
 const Post = ({ post }) => {
-  console.log("post form post com:");
   const { token } = useToken();
   const [likes, setLikes] = useState(post?.likes ?? 0);
 
@@ -23,16 +22,16 @@ const Post = ({ post }) => {
   return (
     <div className="post-card">
       <div>
-        <Avatar alt={post.name} src={post.avatarURL ?? defaultAvatar} sx={{ width: 70, height: 70 }} />
+        <Avatar alt={post.name} src={post.avatarURL ?? defaultAvatar} sx={{ width: 50, height: 50 }} />
       </div>
-      <div className="bg-[--post-color] p-5 my-2">
+      <div className="bg-[--post-color] p-5 my-2 w-[95%] rounded-xl">
         <div className="flex">
           <h3 className="text-[--primary-color]">{post.name}</h3>
           <small className="ml-5 text-gray-100 opacity-50">Posted at {post.date ? formatDate(post.date) : formatDate(Date.now())}</small>
         </div>
 
         <div>
-          <p className="break-words text-white my-3">
+          <p className="whitespace-pre-line text-white my-3">
             <b>{post.text}</b>
           </p>
 

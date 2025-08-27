@@ -18,7 +18,7 @@ const Search = ({ type }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center bg-[--primary-color] p-5 rounded-xl my-5">
+    <form onSubmit={handleSubmit} className="flex items-center bg-[--primary-color] p-5 rounded-xl my-5 mx-3 lg:mx-0">
       <button type="submit" className="bg-inherit border-none">
         <MagnifyingGlassIcon className="w-5 h-5 text-white cursor-pointer" />
       </button>

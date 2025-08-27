@@ -1,7 +1,7 @@
 import { Avatar } from "@mui/material";
 import { addFollow } from "../../../utils/APIs/userService";
 import { useToken } from "../../TokenContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getMyProfile } from "../../../utils/APIs/profileService";
 import defaultAvatar from "../../../Images/blank-profile-picture.png";
 
@@ -40,15 +40,18 @@ const SuggestedPerson = ({ user }) => {
   };
 
   return (
-    <>
-      <Avatar src={user.avatarUrl ?? defaultAvatar} alt={user.name}>
-        {user.name?.[0] ?? "?"}
-      </Avatar>
-      <p className="text-lg mx-5 w-40 text-white">{user.name}</p>
+    <div className="flex">
+      <Link className="flex items-center my-3 cursor-pointer" to={`/showDeveloper/${user.userId}`}>
+        <Avatar src={user.avatarUrl ?? defaultAvatar} alt={user.name}>
+          {user.name?.[0] ?? "?"}
+        </Avatar>
+        <p className="text-lg mx-2 w-28 text-white">{user.name}</p>
+      </Link>
+
       <button onClick={() => handleOnFollowClick(user.userId)} className="btn btn-primary">
         Follow
       </button>
-    </>
+    </div>
   );
 };
 

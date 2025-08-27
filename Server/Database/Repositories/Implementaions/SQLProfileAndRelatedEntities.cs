@@ -89,9 +89,9 @@ namespace Database.Repositories.Implementaions
             return UpdatedProfile;
         }
 
-        public async Task<Profile?> GetProfile(int id)
+        public async Task<Profile?> GetProfile(string id)
         {
-            return await _dbApp.profiles.Include(p => p.Educations).Include(p => p.Experiences).FirstOrDefaultAsync(p => p.Id == id);
+            return await _dbApp.profiles.Include(p => p.Educations).Include(p => p.Experiences).FirstOrDefaultAsync(p => p.UserId == id);
         }
 
         public async Task<Profile?> GetProfileByUserId(string UserId)

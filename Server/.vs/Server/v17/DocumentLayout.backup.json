@@ -3,12 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{151CC608-71FA-4E2C-8C51-131670F30127}|Database\\Database.csproj|c:\\users\\abdalrahman\\desktop\\projects\\noorsphere\\server\\database\\repositories\\implementaions\\sqlprofileandrelatedentities.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{151CC608-71FA-4E2C-8C51-131670F30127}|Database\\Database.csproj|solutionrelative:database\\repositories\\implementaions\\sqlprofileandrelatedentities.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|c:\\users\\abdalrahman\\desktop\\projects\\noorsphere\\server\\server\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|solutionrelative:server\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|c:\\users\\abdalrahman\\desktop\\projects\\noorsphere\\server\\server\\controllers\\profilescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|solutionrelative:server\\controllers\\profilescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|c:\\users\\abdalrahman\\desktop\\projects\\noorsphere\\server\\server\\controllers\\postscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|solutionrelative:server\\controllers\\postscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{151CC608-71FA-4E2C-8C51-131670F30127}|Database\\Database.csproj|c:\\users\\abdalrahman\\desktop\\projects\\noorsphere\\server\\database\\repositories\\implementaions\\configurationrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{151CC608-71FA-4E2C-8C51-131670F30127}|Database\\Database.csproj|solutionrelative:database\\repositories\\implementaions\\configurationrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -31,27 +35,39 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "SQLProfileAndRelatedEntities.cs",
-              "DocumentMoniker": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Database\\Repositories\\Implementaions\\SQLProfileAndRelatedEntities.cs",
-              "RelativeDocumentMoniker": "Database\\Repositories\\Implementaions\\SQLProfileAndRelatedEntities.cs",
-              "ToolTip": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Database\\Repositories\\Implementaions\\SQLProfileAndRelatedEntities.cs",
-              "RelativeToolTip": "Database\\Repositories\\Implementaions\\SQLProfileAndRelatedEntities.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAIoAAAAeAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-30T19:22:24.048Z",
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\appsettings.json",
+              "RelativeDocumentMoniker": "Server\\appsettings.json",
+              "ToolTip": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\appsettings.json",
+              "RelativeToolTip": "Server\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-08-27T09:09:47.451Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "ProfilesController.cs",
-              "DocumentMoniker": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\Controllers\\ProfilesController.cs",
-              "RelativeDocumentMoniker": "Server\\Controllers\\ProfilesController.cs",
-              "ToolTip": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\Controllers\\ProfilesController.cs",
-              "RelativeToolTip": "Server\\Controllers\\ProfilesController.cs",
-              "ViewState": "AgIAAGoBAAAAAAAAAAAWwHcBAABhAAAAAAAAAA==",
+              "Title": "PostsController.cs",
+              "DocumentMoniker": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\Controllers\\PostsController.cs",
+              "RelativeDocumentMoniker": "Server\\Controllers\\PostsController.cs",
+              "ToolTip": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\Controllers\\PostsController.cs",
+              "RelativeToolTip": "Server\\Controllers\\PostsController.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAAsAAAAXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-30T19:18:08.12Z"
+              "WhenOpened": "2025-08-26T12:23:46.43Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ConfigurationRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Database\\Repositories\\Implementaions\\ConfigurationRepository.cs",
+              "RelativeDocumentMoniker": "Database\\Repositories\\Implementaions\\ConfigurationRepository.cs",
+              "ToolTip": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Database\\Repositories\\Implementaions\\ConfigurationRepository.cs",
+              "RelativeToolTip": "Database\\Repositories\\Implementaions\\ConfigurationRepository.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAxwA4AAAA/AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-26T16:29:36.871Z"
             }
           ]
         }

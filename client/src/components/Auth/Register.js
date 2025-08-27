@@ -8,12 +8,15 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
   const { saveToken } = useToken();
+  const [registering, setRegistering] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setRegistering(true);
 
     if (formInput.password !== confirmPassword) {
       alert("Passwords do not match");
+      setRegistering(false);
       return;
     }
 
@@ -25,13 +28,15 @@ const Register = () => {
         navigate("/home");
       } catch (error) {
         alert(error.message);
+      } finally {
+        setRegistering(false);
       }
     };
     register();
   }
 
   return (
-    <div className="flex justify-center items-center h-screen text-center">
+    <div className="flex justify-center items-center h-screen text-center  sm:mt-[20%] lg:mt-[5%]">
       <form onSubmit={handleSubmit} className="shadow-xl p-12">
         <h2 className="p-[20px] text-[30px]">Sign Up</h2>
 
@@ -78,8 +83,8 @@ const Register = () => {
           className="input-style"
         />
 
-        <button type="submit" className="btn btn-primary">
-          Register
+        <button type="submit" className="btn btn-primary btn-comment" disabled={registering}>
+          {registering ? "Registering..." : "Register"}
         </button>
         <p>
           <Link to="/login">Already have account in NoorSphere? Login</Link>

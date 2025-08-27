@@ -28,7 +28,7 @@ const AddExperience = () => {
       console.error("Failed to decode token:", error);
       navigate("/login");
     }
-  }, []);
+  }, [token, decoded, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

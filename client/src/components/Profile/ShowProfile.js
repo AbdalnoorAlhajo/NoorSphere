@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useToken } from "../TokenContext";
 import { Avatar } from "@mui/material";
 import { formatDate } from "../../utils/global";
 import { Tabs, Tab } from "@mui/material";
-import Post from "../../components/Posts/Post";
+import Post from "../Posts/Post";
 import { getMyProfile } from "../../utils/APIs/profileService";
 import { GetPostsByUserId, GetPostsLikedByUser } from "../../utils/APIs/postService";
 import { GetFollowersAndFollowing } from "../../utils/APIs/profileService";
+import { getProfileById } from "../../utils/APIs/userService";
 
-const Profile = () => {
+const ShowProfile = ({ isAnotherProfile }) => {
   const [userProfile, setUserProfile] = useState({});
   const { token, decoded } = useToken();
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Profile = () => {
   const [posts, setPosts] = useState([]);
   const [FollowersAndFollwoing, setFollowersAndFollwoing] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { id } = useParams();
 
   useEffect(() => {
     if (!token) {
@@ -26,17 +28,28 @@ const Profile = () => {
     setIsLoading(true);
 
     const fetchProfile = async () => {
-      return await getMyProfile(token)
-        .then((data) => data)
-        .catch((error) => {
-          if (error.response?.status === 404) {
-            alert("You do not have a profile, please create one.");
-            navigate("/profile/edit");
-          } else {
-            alert("Failed to fetch profile. Please try again.");
-            navigate("/login");
-          }
-        });
+      if (isAnotherProfile) {
+        // Fetch another user's profile
+        return await getProfileById(id, token)
+          .then((data) => data)
+          .catch((error) => {
+            if (error.response?.status === 401) navigate("/home");
+            else console.log(error);
+          });
+      } else {
+        // Fetch my profile
+        return await getMyProfile(token)
+          .then((data) => data)
+          .catch((error) => {
+            if (error.response?.status === 404) {
+              alert("You do not have a profile, please create one.");
+              navigate("/profile/edit");
+            } else {
+              alert("Failed to fetch profile. Please try again.");
+              navigate("/login");
+            }
+          });
+      }
     };
 
     const fetchUserPosts = async (userId) => {
@@ -70,14 +83,14 @@ const Profile = () => {
       const profile = await fetchProfile();
       setUserProfile(profile);
 
-      const FollowsStatus = await fetchFollowersAndFollowing(decoded.id);
+      const FollowsStatus = await fetchFollowersAndFollowing(profile.userId);
       setFollowersAndFollwoing(FollowsStatus);
 
       if (value === "1") {
-        const posts = await fetchUserPosts(decoded.id);
+        const posts = await fetchUserPosts(profile.userId);
         setPosts(posts);
       } else if (value === "2") {
-        const posts = await fetchPostsLikedByUser(decoded.id);
+        const posts = await fetchPostsLikedByUser(profile.userId);
         setPosts(posts);
       }
 
@@ -85,16 +98,16 @@ const Profile = () => {
     };
 
     fetchAll();
-  }, [token, decoded, navigate, value]);
+  }, [token, decoded, navigate, value, isAnotherProfile, id]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div className="text-white m-6">Loading...</div>;
 
   return (
-    <div className="p-6">
+    <div className="p-3">
       <div className="flex justify-between place-items-center">
         <Avatar
           className=" border-[--primary-color] border-8 border-solid"
@@ -102,12 +115,14 @@ const Profile = () => {
           src={userProfile.avatarUrl}
           sx={{ width: 150, height: 150 }}
         />
-        <Link className="bg-[--primary-color] w-30 p-4 text-center text-white rounded-full hover:opacity-50" to={"/profile/edit"}>
-          Edit profile
-        </Link>
+        {!isAnotherProfile && (
+          <Link className="bg-[--primary-color] w-30 p-4 text-center text-white rounded-full hover:opacity-50" to={"/profile/edit"}>
+            Edit profile
+          </Link>
+        )}
       </div>
       <div className="text-blue-300">
-        <p className="text-3xl text-[--primary-color] font-bold mt-5 block">{decoded?.name}</p>
+        <p className="text-3xl text-[--primary-color] font-bold mt-5 block">{userProfile?.name}</p>
         <div className="my-2 flex items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -148,7 +163,7 @@ const Profile = () => {
           <span> {FollowersAndFollwoing.followers} Followers</span>
         </div>
 
-        <div className="mt-5">
+        <div className="my-5">
           <Tabs value={value} onChange={handleChange} aria-label="Fillter posts">
             <Tab label="Posts" value="1" />
             <Tab label="Likes" value="2" />
@@ -164,4 +179,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ShowProfile;

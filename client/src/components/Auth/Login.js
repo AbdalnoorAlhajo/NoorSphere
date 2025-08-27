@@ -7,9 +7,11 @@ const Login = () => {
   const [formInput, setFormInput] = useState({ email: "", password: "" });
   const navigate = useNavigate();
   const { saveToken } = useToken();
+  const [logging, setLogging] = useState(false);
 
   function handleSubmit(e) {
     e.preventDefault();
+    setLogging(true);
 
     if (formInput.password.length < 6) {
       alert("Password must be more than 6 characters");
@@ -24,13 +26,16 @@ const Login = () => {
         navigate("/home");
       } catch (error) {
         alert(error.message);
+        console.error(error);
+      } finally {
+        setLogging(false);
       }
     };
     login();
   }
 
   return (
-    <div className="flex justify-center items-center h-screen text-center">
+    <div className="flex justify-center items-center h-screen text-center sm:mt-[20%] lg:mt-0">
       <form className="shadow-xl p-12" onSubmit={handleSubmit}>
         <h2 className="p-[20px] text-[30px]">Sign In</h2>
 
@@ -56,8 +61,8 @@ const Login = () => {
           className="input-style"
         />
 
-        <button type="submit" className="btn btn-primary">
-          Login
+        <button type="submit" className="btn btn-primary" disabled={logging}>
+          {logging ? "Logging..." : "Login"}
         </button>
 
         <p>

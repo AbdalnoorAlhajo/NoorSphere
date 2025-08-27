@@ -46,16 +46,16 @@ const Explore = () => {
         <LeftSideNavbar />
 
         {/* Main Content Area */}
-        <div className="col-span-6 xl:col-span-3  sm:px-10 lg:px-20 xl:px-0">
+        <div className="col-span-6 xl:col-span-3 lg:px-20 xl:px-0">
           <Search type={"explore"} />
           <div className="mt-6">
             {query ? (
-              <>
-                <h2 className="text-xl font-semibold text-[--primary-color]">Search Results for: {query}</h2>
+              <div className="mx-2">
+                <h2 className="text-xl font-semibold text-[--primary-color]  m-4">Search Results for: {query}</h2>
                 {loading ? (
-                  <p className="text-white my-6">Loading...</p>
+                  <p className="text-white m-6">Loading...</p>
                 ) : results.length === 0 ? (
-                  <p className="text-white my-6">No results found.</p>
+                  <p className="text-white m-6">No results found.</p>
                 ) : (
                   <>
                     {results.map((post) => (
@@ -63,13 +63,13 @@ const Explore = () => {
                     ))}
                   </>
                 )}
-              </>
+              </div>
             ) : (
-              <>
-                <h2 className="text-xl font-semibold text-[--primary-color]">Start Exploring</h2>
+              <div className="mx-6">
+                <h2 className="text-xl font-semibold text-[--primary-color] my-6">Start Exploring</h2>
                 <p className="text-white my-6">Use the search bar above to find people, topics, or projects</p>
                 <Glowing />
-              </>
+              </div>
             )}
           </div>
         </div>

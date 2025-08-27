@@ -20,7 +20,7 @@ const Following = () => {
   }, [token]);
 
   return (
-    <div className="border-2 border-solid rounded-xl border-[--primary-color]">
+    <div className="border-2 border-solid rounded-xl border-[--primary-color] mx-6 lg:mx-0 ">
       <div className="flex items-center p-3">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -42,10 +42,10 @@ const Following = () => {
       </div>
       <hr className="border-[--primary-color]" />
       {followingSuggestions.length === 0 ? (
-        <h2 className="text-center text-gray-300 mt-5">No suggestions avaliable</h2>
+        <h2 className="text-center text-gray-300 my-5">No suggestions avaliable</h2>
       ) : (
         followingSuggestions.map((user) => (
-          <div key={user.userId} className="flex items-center m-5 p-3">
+          <div key={user.userId} className="flex items-center m-5 py-3">
             <SuggestedPerson user={user} />
           </div>
         ))

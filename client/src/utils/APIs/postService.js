@@ -173,6 +173,22 @@ export const GetPostsLikedByUser = async (token, userId) => {
     });
 };
 
+export const GeneratePostWithAI = async (token, post) => {
+  return axios
+    .post(`${serverUrl}posts/generatePost`, post, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+    .then((response) => {
+      return response.data.candidates[0].content.parts[0].text;
+    })
+    .catch((error) => {
+      handleError(error);
+    });
+};
+
 const handleError = (error) => {
   if (error.response) {
     if (error.response.status === 404) {
@@ -185,6 +201,7 @@ const handleError = (error) => {
       throw new Error("Something went wrong. Please try again.");
     }
   } else {
+    console.error("Error:", error.message);
     throw new Error("An unexpected error occurred. Please try again later.");
   }
 };

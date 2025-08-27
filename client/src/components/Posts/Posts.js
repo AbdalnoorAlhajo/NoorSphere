@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useToken } from "../TokenContext";
 import { Tab, Tabs } from "@mui/material";
 import Post from "../Posts/Post";
-import { GetAllPosts, SavePost, GetPostsByFollowedUsers } from "../../utils/APIs/postService";
+import { GetAllPosts, SavePost, GetPostsByFollowedUsers, GeneratePostWithAI } from "../../utils/APIs/postService";
 import { getMyProfile } from "../../utils/APIs/profileService";
 import { UploadImageToCloudinary } from "../../utils/APIs/imageService";
 
@@ -16,11 +16,28 @@ const Posts = () => {
   const [imageURL, setImageURL] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [posting, setPosting] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [prompt, setPrompt] = useState("");
+  const [isCreatingPost, setIsCreatingPost] = useState(false);
 
   const navigate = useNavigate();
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+  };
+
+  const generatePost = async (post) => {
+    setIsCreatingPost(true);
+    try {
+      const response = await GeneratePostWithAI(token, post);
+      setInputValue(response);
+      setIsOpen(false);
+    } catch (error) {
+      console.error("Error generating post:", error.response ? error.response.data : error.message);
+      return null;
+    } finally {
+      setIsCreatingPost(false);
+    }
   };
 
   useEffect(() => {
@@ -60,6 +77,8 @@ const Posts = () => {
   }, [token, navigate, value]);
 
   const OnPostClick = async () => {
+    setPosting(true);
+
     const fetchProfile = async () => {
       return await getMyProfile(token)
         .then((data) => data)
@@ -75,9 +94,10 @@ const Posts = () => {
     };
     const profile = await fetchProfile();
 
-    if (!profile) return;
-
-    setPosting(true);
+    if (!profile) {
+      setPosting(false);
+      return;
+    }
 
     let cloudURL = null;
     try {
@@ -105,6 +125,7 @@ const Posts = () => {
             name: response.name,
             text: response.text,
             imageURL: response.imageURL,
+            avatarURL: response.avatarURL,
             date: response.date,
             id: response.id,
             likes: response.likes,
@@ -120,11 +141,11 @@ const Posts = () => {
     setPosting(false);
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div className="text-white m-6">Loading...</div>;
   else
     return (
       <div className="container">
-        <div>
+        <div className="mb-4">
           <Tabs value={value} onChange={handleChange} aria-label="Fillter posts">
             <Tab label="All" value="1" />
             <Tab label="Following" value="2" />
@@ -134,14 +155,12 @@ const Posts = () => {
           ""
         ) : (
           <div className="post">
-            <input
-              type="text"
-              className="bg-inherit pb-6 text-xl outline-none  placeholder:text-[--primary-color] text-[--primary-color]"
+            <textarea
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="What is in your mind?"
-            />
-
+              className="w-full h-full p-[10px] m-0 bg-inherit placeholder:text-[--primary-color] text-[--primary-color] rounded-[10px] border border-none resize-none"
+            ></textarea>
             {imageURL && (
               <div className="mt-2">
                 <img src={imageURL} alt="Preview" className="rounded-lg max-w-full h-auto" />
@@ -208,6 +227,57 @@ const Posts = () => {
                     />
                   </svg>
                 </button>
+
+                {/* Create post with AI*/}
+                <button onClick={() => setIsOpen(true)} title="Create post with AI" className="ml-2 bg-inherit border-none cursor-pointer">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="stroke-[--primary-color] size-10"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"
+                    />
+                  </svg>
+                </button>
+
+                {isOpen && (
+                  <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+                    <div className="bg-[--secondary-color] rounded-2xl p-6 w-[400px] relative text-[--primary-color]">
+                      {/* Close button */}
+                      <button
+                        disabled={isCreatingPost}
+                        onClick={() => setIsOpen(false)}
+                        className="absolute top-2 right-2 p-2 bg-red-500 hover:text-red-700"
+                      >
+                        ✖
+                      </button>
+
+                      <h2 className="text-lg font-bold mb-4">Create a post with AI</h2>
+
+                      {/* Input field */}
+                      <textarea
+                        placeholder="Describe the post to create..."
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
+                        className="w-full p-2 m-0  border rounded mb-4 text-[--primary-color] "
+                      />
+
+                      {/* Action Button */}
+                      <button
+                        onClick={() => generatePost(prompt)}
+                        className="mt-4 w-full bg-[--primary-color] text-white py-2 rounded-lg hover:bg-[--secondary-color] border border-[--primary-color]"
+                      >
+                        {isCreatingPost ? "Generating..." : "Generate Post"}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
               <button className="btn btn-primary absolute bottom-0 right-0" onClick={OnPostClick} disabled={posting}>
                 {posting ? "Posting..." : "Post"}

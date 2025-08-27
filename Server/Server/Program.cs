@@ -13,10 +13,13 @@ using Database.Models.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHttpClient();
+
 // Add services to the container.
 builder.Services.AddDbContext<NoorSphere>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
 builder.Services.AddScoped<IUserRepository, SQLUserRepository>();
 builder.Services.AddScoped
     <IPostAndRelatedEntitiesRepository, SQLPostAndRelatedEntitiesRepository>();
@@ -87,7 +90,9 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
-        policy => policy.WithOrigins("http://localhost:3000") 
+        policy => policy.WithOrigins("http://localhost:3000",
+                            "https://noor-shere-client.vercel.app",
+                            "https://noor-shere-client-git-master-abdalnoor-alhajos-projects.vercel.app") 
                         .AllowAnyMethod() 
                         .AllowAnyHeader()  
                         .AllowCredentials());
