@@ -16,14 +16,19 @@ const Posts = () => {
   const [imageURL, setImageURL] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [posting, setPosting] = useState(false);
+  const [isGetMorePosts, setIsGetMorePosts] = useState(false);
+  const [isThereMorePosts, setIsThereMorePosts] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [isCreatingPost, setIsCreatingPost] = useState(false);
+  const [LastPostId, setLastPostId] = useState(0);
 
   const navigate = useNavigate();
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+    setIsThereMorePosts(true);
+    setLastPostId(0);
   };
 
   const generatePost = async (post) => {
@@ -45,9 +50,13 @@ const Posts = () => {
 
     if (value === "1") {
       const fetchPosts = async () => {
+        setIsGetMorePosts(true);
         try {
-          const data = await GetAllPosts(token);
-          setPosts(data);
+          const data = await GetAllPosts(token, LastPostId);
+
+          if (data.length < 2) setIsThereMorePosts(false);
+
+          LastPostId === 0 ? setPosts(data) : setPosts((posts) => [...posts, ...data]);
         } catch (error) {
           alert(error.message);
           if (error.message === "Unauthorized") {
@@ -55,6 +64,7 @@ const Posts = () => {
           }
         } finally {
           setIsLoading(false);
+          setIsGetMorePosts(false);
         }
       };
       fetchPosts();
@@ -74,7 +84,7 @@ const Posts = () => {
       };
       fetchPostsByFollowedUsers();
     }
-  }, [token, navigate, value]);
+  }, [token, navigate, value, LastPostId]);
 
   const OnPostClick = async () => {
     setPosting(true);
@@ -139,6 +149,12 @@ const Posts = () => {
       });
 
     setPosting(false);
+  };
+
+  const GetMorePosts = () => {
+    if (posts.length > 0) {
+      setLastPostId(posts[posts.length - 1].id);
+    }
   };
 
   if (isLoading) return <div className="text-white m-6">Loading...</div>;
@@ -288,7 +304,22 @@ const Posts = () => {
         {posts.length === 0 ? (
           <h2 className="text-center text-gray-300 mt-5">No posts avaliable{value === "2" ? " for Following" : ""}</h2>
         ) : (
-          posts.map((post) => <Post key={post.id} post={post} />)
+          <div>
+            {posts.map((post) => (
+              <Post key={post.id} post={post} />
+            ))}
+            {isThereMorePosts && value === "1" ? (
+              <button
+                className="bg-[--primary-color] w-[200px] p-4 ml-[35%] my-5 text-xl text-white rounded-full hover:opacity-50"
+                onClick={GetMorePosts}
+                disabled={isGetMorePosts}
+              >
+                {isGetMorePosts ? "Loading more posts..." : "Get More Posts"}
+              </button>
+            ) : (
+              <h2 className="text-center text-gray-300 my-5">No more posts to show</h2>
+            )}
+          </div>
         )}
       </div>
     );

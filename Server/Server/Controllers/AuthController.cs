@@ -3,7 +3,11 @@ using Database.Models.DTOs.UserAndRelatedEntities.User;
 using Database.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System;
+using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace Server.Controllers
 {
@@ -13,11 +17,13 @@ namespace Server.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly ITokenRepository _tokenRepository;
+        private readonly IGuestCache _cache;
 
-        public AuthController(UserManager<User> userManager, ITokenRepository tokenRepository)
+        public AuthController(UserManager<User> userManager, ITokenRepository tokenRepository, IGuestCache memoryCache)
         {
             _userManager = userManager;
             _tokenRepository = tokenRepository;
+            _cache = memoryCache;
         }
 
         /// <summary>
@@ -86,7 +92,12 @@ namespace Server.Controllers
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
-                var user = await _userManager.FindByEmailAsync(loginDTO.Email);
+
+                User user;
+                if (loginDTO.Email.Equals("Guest@noorsphere.com"))
+                    user = await _cache.GetGuestCatchedInfo(loginDTO.Email);
+                else
+                    user = await _userManager.FindByEmailAsync(loginDTO.Email);
 
                 if (user != null)
                 {

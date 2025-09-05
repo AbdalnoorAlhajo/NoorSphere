@@ -37,9 +37,6 @@ namespace Database
         // Posts and related entities
         public DbSet<Post> posts { get; set; }
 
-        // This is about to be deleted
-        //public DbSet<Comment> comments { get; set; }
-
         public DbSet<Like> likes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -92,21 +89,6 @@ namespace Database
                 .WithMany(f => f.Followings)
                 .HasForeignKey(l => l.FollowerUserId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            //// comments part is about to be deleted
-
-            //// One Post has many Comments 
-            //modelBuilder.Entity<Comment>()
-            //    .HasOne<Post>()
-            //    .WithMany(p => p.comments)
-            //    .HasForeignKey(c => c.PostId);
-
-            //// One User has many Comments 
-            //modelBuilder.Entity<Comment>()
-            //    .HasOne<User>()
-            //    .WithMany()
-            //    .HasForeignKey(c => c.UserId);
-
         }
     }
 }

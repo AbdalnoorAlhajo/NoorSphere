@@ -126,18 +126,19 @@ public class PostsController : ControllerBase
     /// <summary>
     /// Retrieves all posts from the database.
     /// </summary>
+    /// <param name="lastSeenId">The ID of the last post seen by the client (used for keyset pagination).</param>
     /// <returns>Returns a list of all posts as <see cref="GetPostDTO"/> Objects.</returns>
     [HttpGet("all")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetPosts()
+    public async Task<IActionResult> GetPosts([FromQuery] int lastSeenId = 0)
     {
         try
         {
             var UserId = UserService.ExtractUserIDFromToken(Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last());
 
-            var postsList = await _postAndRelatedEntities.GetAllPosts(UserId);
+            var postsList = await _postAndRelatedEntities.GetAllPosts(UserId, lastSeenId);
 
             if (postsList.Count < 1)
                 return NotFound($"Posts are not found.");

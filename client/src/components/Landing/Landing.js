@@ -1,7 +1,21 @@
 import { Link } from "react-router-dom";
 import LandingTitle from "./LandingTitle";
+import { loginUser } from "../../utils/APIs/userService";
+import { useEffect } from "react";
 
 const Landing = () => {
+  useEffect(() => {
+    const warmBackend = async () => {
+      try {
+        const guestCredentials = { email: "Guest@noorsphere.com", password: "ilovenoorsphere" };
+        await loginUser(guestCredentials);
+      } catch (error) {
+        console.error("Backend warm-up failed:", error);
+      }
+    };
+    warmBackend();
+  }, []);
+
   return (
     <div className="landing">
       <div className="dark-overlay">

@@ -79,7 +79,7 @@ namespace Database.Repositories.Implementaions
             .ToArray();
         }
 
-        public async Task<List<GetPostDTO>> GetAllPosts(string currentUserId)
+        public async Task<List<GetPostDTO>> GetAllPosts(string currentUserId, int lastSeenId)
         {
             return await (from post in _dbApp.posts
                                join profile in _dbApp.profiles
@@ -96,7 +96,9 @@ namespace Database.Repositories.Implementaions
                                    likes = post.likes.Count,
                                    IsLiked = post.likes.Any(l => l.UserId == currentUserId),
                                    comments = _dbApp.posts.Count(c => c.PostId == post.Id)
-                               }).ToListAsync();
+                               }).OrderBy(p => p.Id).Where(p => p.Id > lastSeenId)
+    .Take(2).ToListAsync(); 
+
         }
 
 

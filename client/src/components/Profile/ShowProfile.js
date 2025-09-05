@@ -5,10 +5,8 @@ import { Avatar } from "@mui/material";
 import { formatDate } from "../../utils/global";
 import { Tabs, Tab } from "@mui/material";
 import Post from "../Posts/Post";
-import { getMyProfile } from "../../utils/APIs/profileService";
+import { getMyProfile, getProfileById, GetFollowersAndFollowing } from "../../utils/APIs/profileService";
 import { GetPostsByUserId, GetPostsLikedByUser } from "../../utils/APIs/postService";
-import { GetFollowersAndFollowing } from "../../utils/APIs/profileService";
-import { getProfileById } from "../../utils/APIs/userService";
 
 const ShowProfile = ({ isAnotherProfile }) => {
   const [userProfile, setUserProfile] = useState({});

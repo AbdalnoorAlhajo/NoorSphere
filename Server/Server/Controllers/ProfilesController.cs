@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
+using Database.Models.Domain;
 using Database.Models.DTOs.ProfileAndRelatedEntities.Education;
 using Database.Models.DTOs.ProfileAndRelatedEntities.Experience;
 using Database.Models.DTOs.ProfileAndRelatedEntities.Profile;
 using Database.Models.DTOs.UserAndRelatedEntities.Follow;
 using Database.Repositories.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Database.Utils;
 using Microsoft.AspNetCore.Authorization;
-using Database.Models.Domain;
+using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using Profile = Database.Models.Domain.Profile;
 
 namespace Server.Controllers
@@ -20,13 +21,14 @@ namespace Server.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IProfileAndRelatedEntities _profileAndRelatedEntities;
         private readonly IMapper _mapper;
-
+        private readonly IGuestCache _cache;
         public ProfileController(IUserRepository userRepository, IMapper mapper
-            , IProfileAndRelatedEntities profileAndRelatedEntities)
+            , IProfileAndRelatedEntities profileAndRelatedEntities, IGuestCache cache)
         {
             _profileAndRelatedEntities = profileAndRelatedEntities;
             _userRepository = userRepository;
             _mapper = mapper;
+            _cache = cache;
         }
 
         /// <summary>
@@ -399,8 +401,13 @@ namespace Server.Controllers
             try
             {
                 var UserId = UserService.ExtractUserIDFromToken(Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last());
+                var user = await _userRepository.GetUser(UserId);
 
-                var avatarUrl = await _profileAndRelatedEntities.GetImageURL(UserId);
+                string avatarUrl;
+                if (user.Email.Equals("Guest@noorsphere.com"))
+                    avatarUrl = await _cache.GetImageURL(UserId);
+                else
+                    avatarUrl = await _profileAndRelatedEntities.GetImageURL(UserId);
 
                 if (string.IsNullOrEmpty(avatarUrl))
                     return NotFound("Avatar not found for the specified user.");

@@ -1,13 +1,14 @@
 import axios from "axios";
 import { serverUrl } from "../global";
 
-export const GetAllPosts = (token) => {
+export const GetAllPosts = (token, lastSeenId = 0) => {
   return axios
     .get(`${serverUrl}posts/all`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
+      params: { lastSeenId },
     })
     .then((response) => {
       return response.data;

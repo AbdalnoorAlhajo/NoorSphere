@@ -5,7 +5,7 @@ import Search from "../Navbars/LeftNavComps/Search";
 import LeftSideNavbar from "../Navbars/LeftSideNavbar";
 import NavbarPhone from "../Navbars/NavbarPhone";
 import Glowing from "../Navbars/LeftNavComps/Glowing";
-import { getProfiles } from "../../utils/APIs/userService";
+import { getProfiles } from "../../utils/APIs/profileService";
 import SuggestedPerson from "../Navbars/LeftNavComps/SuggestedPerson";
 import { GetFollowingSuggestionsByName } from "../../utils/APIs/profileService";
 import Following from "../Navbars/LeftNavComps/Following";

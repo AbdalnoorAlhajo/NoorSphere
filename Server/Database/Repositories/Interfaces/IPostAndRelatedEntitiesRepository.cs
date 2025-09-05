@@ -8,7 +8,7 @@ namespace Database.Repositories.Interfaces
     public interface IPostAndRelatedEntitiesRepository
     {
         Task<Post> AddPost(Post newPost);
-        Task<List<GetPostDTO>> GetAllPosts(string currentUserId);
+        Task<List<GetPostDTO>> GetAllPosts(string currentUserId, int lastSeenId);
         Task<Like> AddLike(Like newLike);
 
         Task<TrendingTopicDTO[]> GetTrendingTopics();

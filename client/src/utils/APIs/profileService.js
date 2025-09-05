@@ -15,6 +15,34 @@ export const getMyProfile = async (token) => {
     });
 };
 
+export const getProfiles = (token) => {
+  return axios
+    .get(`${serverUrl}profiles`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => response.data)
+    .catch((error) => {
+      throw error;
+    });
+};
+
+export const getProfileById = (id, token) => {
+  return axios
+    .get(`${serverUrl}profiles/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => response.data)
+    .catch((error) => {
+      throw error;
+    });
+};
+
 export const GetFollowingSuggestionsByName = async (token, name) => {
   return axios
     .get(`${serverUrl}profiles/suggestions/search`, {
