@@ -183,7 +183,7 @@ export const GeneratePostWithAI = async (token, post) => {
       },
     })
     .then((response) => {
-      return response.data.candidates[0].content.parts[0].text;
+      return response.data;
     })
     .catch((error) => {
       handleError(error);

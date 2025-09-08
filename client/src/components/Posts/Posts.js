@@ -46,7 +46,7 @@ const Posts = () => {
   };
 
   useEffect(() => {
-    setIsLoading(true);
+    if (LastPostId === 0) setIsLoading(true);
 
     if (value === "1") {
       const fetchPosts = async () => {
@@ -175,7 +175,7 @@ const Posts = () => {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="What is in your mind?"
-              className="w-full h-full p-[10px] m-0 bg-inherit placeholder:text-[--primary-color] text-[--primary-color] rounded-[10px] border border-none resize-none"
+              className="w-full h-[100px] p-[10px] m-0 bg-inherit placeholder:text-[--primary-color] text-[--primary-color] rounded-[10px] border border-none resize-none"
             ></textarea>
             {imageURL && (
               <div className="mt-2">
@@ -287,6 +287,7 @@ const Posts = () => {
                       {/* Action Button */}
                       <button
                         onClick={() => generatePost(prompt)}
+                        disabled={isCreatingPost}
                         className="mt-4 w-full bg-[--primary-color] text-white py-2 rounded-lg hover:bg-[--secondary-color] border border-[--primary-color]"
                       >
                         {isCreatingPost ? "Generating..." : "Generate Post"}

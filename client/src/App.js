@@ -16,6 +16,7 @@ import Discussion from "./components/Posts/Discussion";
 import { TokenProvider } from "./components/TokenContext";
 import Explore from "./components/Posts/Explore.";
 import ShowDeveloper from "./components/Developers/ShowDevoloper";
+import ChatWithAI from "./components/Chats/ChatWithAI";
 
 function App() {
   return (
@@ -54,6 +55,11 @@ function App() {
         <Route path="/developers" element={<Developers />}></Route>
         <Route path="/showDeveloper/:id" element={<Home />}>
           <Route index element={<ShowDeveloper />} />
+        </Route>
+
+        {/* Chats */}
+        <Route path="/home" element={<Home />}>
+          <Route index path="chat" element={<ChatWithAI />} />
         </Route>
       </Routes>
     </TokenProvider>

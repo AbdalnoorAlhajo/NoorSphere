@@ -19,7 +19,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddDbContext<NoorSphere>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
+builder.Services.AddScoped<IAIRepository, AIRepository>();
 builder.Services.AddScoped<IGuestCache, GuestCacheImplementation>();
 builder.Services.AddScoped<IUserRepository, SQLUserRepository>();
 builder.Services.AddScoped

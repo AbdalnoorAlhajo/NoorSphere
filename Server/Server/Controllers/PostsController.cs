@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Database;
 using Database.Models.Domain;
 using Database.Models.DTOs.Post;
 using Database.Models.DTOs.PostAndRelatedEntities.Post;
@@ -7,12 +6,7 @@ using Database.Repositories.Interfaces;
 using Database.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-using Microsoft.Extensions.Configuration;
 
-using static Database.Repositories.Implementaions.SQLPostAndRelatedEntitiesRepository;
 
 namespace Server.Controllers;
 
@@ -26,18 +20,15 @@ public class PostsController : ControllerBase
     private readonly IProfileAndRelatedEntities _profileAndRelatedEntities;
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IConfigurationRepository _configurationRepository;
-
+    private readonly IAIRepository _aiRepository;
     public PostsController(IUserRepository userRepository, IMapper mapper, IPostAndRelatedEntitiesRepository postAndRelatedEntities
-        , IProfileAndRelatedEntities profileAndRelatedEntities, IHttpClientFactory httpClientFactory, IConfigurationRepository configurationRepository)
+        , IProfileAndRelatedEntities profileAndRelatedEntities, IAIRepository aRepository)
     {
         _postAndRelatedEntities = postAndRelatedEntities;
         _profileAndRelatedEntities = profileAndRelatedEntities;
         _userRepository = userRepository;
         _mapper = mapper;
-        _httpClientFactory = httpClientFactory;
-        _configurationRepository = configurationRepository;
+        _aiRepository = aRepository;
     }
 
 
@@ -51,28 +42,9 @@ public class PostsController : ControllerBase
     {
         try
         {
-            var client = _httpClientFactory.CreateClient();
-            var requestBody = new
-            {
-                contents = new[]
-                {
-                    new { parts = new[] { new { text = "Write a single social media post under 100 words. Do not ask questions. Do not include multiple options. Just generate one complete post. Topic: " + prompt } } }
-                }
-            };
+            var GeneratedPost = await _aiRepository.GeneratePost(prompt);
 
-            var content = new StringContent(
-                JsonSerializer.Serialize(requestBody),
-                Encoding.UTF8,
-                "application/json"
-            );
-
-            var response = await client.PostAsync(
-                $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={_configurationRepository.GetAiApiKey()}",
-                content
-            );
-
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-            return Ok(jsonResponse);
+            return Ok(GeneratedPost);
         }
         catch (Exception ex)
         {

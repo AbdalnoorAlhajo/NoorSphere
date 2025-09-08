@@ -3,6 +3,22 @@
   "WorkspaceRootPath": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|c:\\users\\abdalrahman\\desktop\\projects\\noorsphere\\server\\server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|solutionrelative:server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{151CC608-71FA-4E2C-8C51-131670F30127}|Database\\Database.csproj|c:\\users\\abdalrahman\\desktop\\projects\\noorsphere\\server\\database\\repositories\\implementaions\\airepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{151CC608-71FA-4E2C-8C51-131670F30127}|Database\\Database.csproj|solutionrelative:database\\repositories\\implementaions\\airepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{151CC608-71FA-4E2C-8C51-131670F30127}|Database\\Database.csproj|c:\\users\\abdalrahman\\desktop\\projects\\noorsphere\\server\\database\\repositories\\interfaces\\iairepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{151CC608-71FA-4E2C-8C51-131670F30127}|Database\\Database.csproj|solutionrelative:database\\repositories\\interfaces\\iairepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|c:\\users\\abdalrahman\\desktop\\projects\\noorsphere\\server\\server\\controllers\\postscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|solutionrelative:server\\controllers\\postscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|c:\\users\\abdalrahman\\desktop\\projects\\noorsphere\\server\\server\\controllers\\profilescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|solutionrelative:server\\controllers\\profilescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -13,10 +29,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|c:\\users\\abdalrahman\\desktop\\projects\\noorsphere\\server\\server\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|solutionrelative:server\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|c:\\users\\abdalrahman\\desktop\\projects\\noorsphere\\server\\server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0AC83331-41BF-40C4-8937-D96A57AD46AB}|Server\\Server.csproj|solutionrelative:server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -39,43 +51,82 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "ProfilesController.cs",
-              "DocumentMoniker": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\Controllers\\ProfilesController.cs",
-              "RelativeDocumentMoniker": "Server\\Controllers\\ProfilesController.cs",
-              "ToolTip": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\Controllers\\ProfilesController.cs",
-              "RelativeToolTip": "Server\\Controllers\\ProfilesController.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAAAYAAAAnAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-01T17:39:59.474Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\appsettings.json",
-              "RelativeDocumentMoniker": "Server\\appsettings.json",
-              "ToolTip": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\appsettings.json",
-              "RelativeToolTip": "Server\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAEAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-09-01T17:29:07.052Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\Program.cs",
               "RelativeDocumentMoniker": "Server\\Program.cs",
               "ToolTip": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\Program.cs",
               "RelativeToolTip": "Server\\Program.cs",
-              "ViewState": "AgIAAA8AAAAAAAAAAAAowBUAAABNAAAAAAAAAA==",
+              "ViewState": "AgIAAGMAAAAAAAAAAAAAAA0AAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-01T16:33:48.052Z"
+              "WhenOpened": "2025-09-07T15:41:59.308Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AIRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Database\\Repositories\\Implementaions\\AIRepository.cs",
+              "RelativeDocumentMoniker": "Database\\Repositories\\Implementaions\\AIRepository.cs",
+              "ToolTip": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Database\\Repositories\\Implementaions\\AIRepository.cs",
+              "RelativeToolTip": "Database\\Repositories\\Implementaions\\AIRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAjwBcAAACEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T08:54:42.566Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "IAIRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Database\\Repositories\\Interfaces\\IAIRepository.cs",
+              "RelativeDocumentMoniker": "Database\\Repositories\\Interfaces\\IAIRepository.cs",
+              "ToolTip": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Database\\Repositories\\Interfaces\\IAIRepository.cs",
+              "RelativeToolTip": "Database\\Repositories\\Interfaces\\IAIRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwA0AAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T08:50:47.271Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "PostsController.cs",
+              "DocumentMoniker": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\Controllers\\PostsController.cs",
+              "RelativeDocumentMoniker": "Server\\Controllers\\PostsController.cs",
+              "ToolTip": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\Controllers\\PostsController.cs",
+              "RelativeToolTip": "Server\\Controllers\\PostsController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEMAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T07:42:12.706Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ProfilesController.cs",
+              "DocumentMoniker": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\Controllers\\ProfilesController.cs",
+              "RelativeDocumentMoniker": "Server\\Controllers\\ProfilesController.cs",
+              "ToolTip": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\Controllers\\ProfilesController.cs",
+              "RelativeToolTip": "Server\\Controllers\\ProfilesController.cs",
+              "ViewState": "AgIAACsAAAAAAAAAAAAQwBUBAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-01T17:39:59.474Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\appsettings.json",
+              "RelativeDocumentMoniker": "Server\\appsettings.json",
+              "ToolTip": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\appsettings.json",
+              "RelativeToolTip": "Server\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-09-01T17:29:07.052Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "AuthController.cs",
               "DocumentMoniker": "C:\\Users\\Abdalrahman\\Desktop\\Projects\\NoorSphere\\Server\\Server\\Controllers\\AuthController.cs",
               "RelativeDocumentMoniker": "Server\\Controllers\\AuthController.cs",
