@@ -1,11 +1,16 @@
 import { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useToken } from "../TokenContext";
 import { deleteUserAccount } from "../../utils/APIs/userService";
+import Confirm from "../Alerts/Confirm";
+import { useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 
 const Settings = () => {
   const navigate = useNavigate();
   const { token, decoded } = useToken();
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [isDeleteButtonClicked, setIsDeleteButtonClicked] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -19,42 +24,52 @@ const Settings = () => {
       console.error("Failed to decode token:", error);
       navigate("/login");
     }
+
+    return () => toast.remove();
   }, [navigate, token, decoded]);
 
   const handleDeleteClick = async () => {
     if (decoded.name === "Guest") {
-      alert("you can not delete Guest account");
+      toast.error("you can not delete Guest account");
+      setIsDeleteButtonClicked(false);
       return;
     }
+    setShowConfirm(true);
+  };
 
-    const confirmation = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
-    if (!confirmation) return;
+  const handleOnEditClick = () => {
+    if (decoded.name === "Guest") toast.error("you can not edit Guest account");
+    else navigate("/profile/edit");
+  };
 
+  const confirmDelete = async () => {
+    setIsDeleteButtonClicked(true);
     try {
-      const message = await deleteUserAccount(localStorage.getItem("token"));
-      alert(message);
+      await deleteUserAccount(localStorage.getItem("token"));
       localStorage.removeItem("token");
       navigate("/login");
     } catch (error) {
-      alert("Failed to delete account: " + error.message);
+      toast.error("Failed to delete account: " + error.message);
+    } finally {
+      setIsDeleteButtonClicked(false);
     }
   };
-
   const BoxStyle = { boxShadow: "0px 11px 35px 2px rgba(0, 0, 0, 0.14)", padding: 20, width: "70%", height: 150, marginBottom: 50 };
 
   return (
     <div className="pt-[100px] text-center justify-items-center">
+      <Toaster position="top-center" />
       <div style={BoxStyle}>
         <p className="text-white my-5">Update your profile Information</p>
-        <Link className="btn btn-primary" to={"/profile/edit"}>
+        <button className="btn btn-primary" style={{ width: 200 }} onClick={handleOnEditClick}>
           Edit Account
-        </Link>
+        </button>
       </div>
-
+      {showConfirm && <Confirm isOpen={showConfirm} setIsOpen={setShowConfirm} confirmDelete={confirmDelete} />}
       <div style={BoxStyle}>
         <p className="text-white my-3">Delete your profile</p>
-        <button className="btn btn-danger" onClick={handleDeleteClick}>
-          Delete Account
+        <button className="btn btn-danger" onClick={handleDeleteClick} disabled={isDeleteButtonClicked}>
+          {isDeleteButtonClicked ? "Deleting account..." : "Delete Account"}
         </button>
       </div>
     </div>

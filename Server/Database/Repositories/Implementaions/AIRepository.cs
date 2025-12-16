@@ -73,7 +73,8 @@ namespace Database.Repositories.Implementaions
             }
             catch (Exception ex)
             {
-                throw ;
+                Console.Write(ex.ToString());
+                throw;
             }
 
         }

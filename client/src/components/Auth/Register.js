@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToken } from "../TokenContext";
 import { registerUser } from "../../utils/APIs/userService";
+import toast from "react-hot-toast";
 
 const Register = () => {
   const [formInput, setFormInput] = useState({ name: "", email: "", password: "" });
@@ -10,12 +11,16 @@ const Register = () => {
   const { saveToken } = useToken();
   const [registering, setRegistering] = useState(false);
 
+  useEffect(() => {
+    return () => toast.remove();
+  }, []);
+
   async function handleSubmit(e) {
     e.preventDefault();
     setRegistering(true);
 
     if (formInput.password !== confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       setRegistering(false);
       return;
     }
@@ -25,9 +30,10 @@ const Register = () => {
         const response = await registerUser(formInput);
 
         saveToken(response.data.token);
+        toast.success("Registration successful!");
         navigate("/home");
       } catch (error) {
-        alert(error.message);
+        toast.error(error.message);
       } finally {
         setRegistering(false);
       }

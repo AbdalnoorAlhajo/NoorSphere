@@ -6,7 +6,6 @@ export const ChatWithAIapi = async (token, message) => {
     contents: message,
   };
 
-  console.log("Payload:", payload);
   return axios
     .post(`${serverUrl}messages/ChatWithAI`, payload, {
       headers: {

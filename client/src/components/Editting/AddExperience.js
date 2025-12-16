@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToken } from "../TokenContext";
 import { serverUrl } from "../../utils/global";
+import toast from "react-hot-toast";
 
 const AddExperience = () => {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const AddExperience = () => {
     e.preventDefault();
     console.log(formData);
     if (formData.title === "" || formData.company === "") {
-      alert("Title and Company are required fileds");
+      toast.error("Title and Company are required fields");
       return;
     }
 
@@ -52,11 +53,15 @@ const AddExperience = () => {
 
       const data = await response.json();
 
-      if (response.ok) navigate("/home");
-      else alert(data.errors[0].msg);
+      if (response.ok) {
+        toast.success("Experience added successfully!");
+        navigate("/home");
+      } else {
+        toast.error(data.errors[0].msg);
+      }
     } catch (error) {
       console.error("Error:", error);
-      alert("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     }
   };
 

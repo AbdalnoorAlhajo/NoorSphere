@@ -2,6 +2,7 @@ import { Link, Outlet, useNavigate } from "react-router-dom";
 import { loginUser } from "../../utils/APIs/userService";
 import { useToken } from "../TokenContext";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -15,9 +16,10 @@ const Navbar = () => {
       const response = await loginUser(guestCredentials);
 
       saveToken(response.data.token);
+      toast.success("Logged in as Guest!");
       navigate("/home");
     } catch (error) {
-      alert(error.message);
+      toast.error(error.message);
     } finally {
       setLogging(false);
     }

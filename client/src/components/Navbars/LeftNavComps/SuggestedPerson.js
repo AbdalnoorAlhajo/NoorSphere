@@ -4,6 +4,7 @@ import { useToken } from "../../TokenContext";
 import { Link, useNavigate } from "react-router-dom";
 import { getMyProfile } from "../../../utils/APIs/profileService";
 import defaultAvatar from "../../../Images/blank-profile-picture.png";
+import toast from "react-hot-toast";
 
 const SuggestedPerson = ({ user }) => {
   const { token, decoded } = useToken();
@@ -15,10 +16,10 @@ const SuggestedPerson = ({ user }) => {
         .then((data) => data)
         .catch((error) => {
           if (error.response?.status === 404) {
-            alert("You do not have a profile, please create one before following.");
+            toast.error("You do not have a profile, please create one before following.");
             navigate("/profile/edit");
           } else {
-            alert("Failed to fetch profile. Please try again.");
+            toast.error("Failed to fetch profile. Please try again.");
             navigate("/login");
           }
         });
@@ -32,10 +33,11 @@ const SuggestedPerson = ({ user }) => {
 
     await addFollow(token, addNewFollowDTO)
       .then(() => {
-        alert("User followed successfully!");
+        toast.success("User followed successfully!");
       })
       .catch((error) => {
         console.error("Error adding follow:", error.response);
+        toast.error("Failed to follow user. Please try again.");
       });
   };
 

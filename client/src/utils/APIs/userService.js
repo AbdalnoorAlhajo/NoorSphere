@@ -65,7 +65,7 @@ export const registerUser = (userData) => {
 
 export const deleteUserAccount = (token) => {
   return axios
-    .delete(`${serverUrl}api/users`, {
+    .delete(`${serverUrl}users`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,

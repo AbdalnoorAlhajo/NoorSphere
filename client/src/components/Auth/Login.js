@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToken } from "../TokenContext";
 import { loginUser } from "../../utils/APIs/userService";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [formInput, setFormInput] = useState({ email: "", password: "" });
@@ -9,12 +10,17 @@ const Login = () => {
   const { saveToken } = useToken();
   const [logging, setLogging] = useState(false);
 
+  useEffect(() => {
+    return () => toast.remove();
+  }, []);
+
   function handleSubmit(e) {
     e.preventDefault();
     setLogging(true);
 
     if (formInput.password.length < 6) {
-      alert("Password must be more than 6 characters");
+      toast.error("Password must be more than 6 characters");
+      setLogging(false);
       return;
     }
 
@@ -25,7 +31,7 @@ const Login = () => {
         saveToken(response.data.token);
         navigate("/home");
       } catch (error) {
-        alert(error.message);
+        toast.error(error.message);
         console.error(error);
       } finally {
         setLogging(false);

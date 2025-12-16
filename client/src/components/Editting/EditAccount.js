@@ -4,11 +4,13 @@ import { useToken } from "../TokenContext";
 import { serverUrl } from "../../utils/global";
 import axios from "axios";
 import { UploadImageToCloudinary } from "../../utils/APIs/imageService";
+import toast from "react-hot-toast";
 
 const EditAccount = () => {
   const navigate = useNavigate();
   const { token, decoded } = useToken();
   const HaveProfile = useRef(false);
+  const redirectDelayMs = 2000;
   const [formData, setFormData] = useState({
     status: "",
     company: "",
@@ -22,8 +24,8 @@ const EditAccount = () => {
 
   useEffect(() => {
     if (decoded.name === "Guest") {
-      alert("you can not edit Guest account");
-      navigate("/home");
+      toast.error("You can not edit Guest account. You will be redirected to home page.");
+      setTimeout(() => navigate("/home"), redirectDelayMs);
       return;
     }
 
@@ -38,28 +40,21 @@ const EditAccount = () => {
         HaveProfile.current = true;
       })
       .catch((error) => {
-        console.log(error);
         if (error.response) {
           if (error.response.status === 404) HaveProfile.current = false;
           else {
-            alert("Failed to fetch profile. Please try again.");
-            navigate("/login");
+            toast.error("Failed to fetch profile. Please try again.");
+            setTimeout(() => navigate("/login"), redirectDelayMs);
           }
         } else {
-          alert("An unexpected error occurred. Please try again later.");
-          navigate("/login");
+          toast.error("An unexpected error occurred. Please try again later.");
+          setTimeout(() => navigate("/home"), redirectDelayMs);
         }
       });
   }, [navigate, token, decoded.name]);
 
   const handleSubmit = async (e) => {
-    console.log("Form Data:", formData);
-
     e.preventDefault();
-    if (formData.skills === "" || formData.status === "") {
-      alert("Skills and Professional Status are required fileds");
-      return;
-    }
 
     console.log("Form Data:", formData);
     if (HaveProfile.current)
@@ -71,12 +66,12 @@ const EditAccount = () => {
           },
         })
         .then(() => {
-          alert("profile Updated");
-          navigate("/home");
+          toast.success("Profile updated successfully!");
+          setTimeout(() => navigate("/home"), redirectDelayMs);
         })
         .catch((error) => {
           console.error("Error:", error);
-          alert("Something went wrong. Please try again.");
+          toast.error("Something went wrong. Please try again.");
         });
     else
       axios
@@ -87,12 +82,12 @@ const EditAccount = () => {
           },
         })
         .then(() => {
-          alert("profile created");
+          toast.success("Profile created successfully!");
           navigate("/home");
         })
         .catch((error) => {
           console.error("Error:", error);
-          alert("Something went wrong. Please try again.");
+          toast.error("Something went wrong. Please try again.");
         });
   };
 
@@ -108,8 +103,9 @@ const EditAccount = () => {
         try {
           const imageURL = await UploadImageToCloudinary(file);
           setFormData((prev) => ({ ...prev, avatarUrl: imageURL }));
+          toast.success("Image uploaded successfully!");
         } catch (error) {
-          alert("Image upload failed. Please try again.");
+          toast.error("Image upload failed. Please try again.");
         }
       };
       await UploadImage();
@@ -121,7 +117,7 @@ const EditAccount = () => {
       <div className="mx-[5%] lg:mx-[10%] text-center justify-items-center">
         <form className="main" onSubmit={handleSubmit}>
           <h1 className="form-title">{HaveProfile.current ? "Edit" : "Create"} Profile</h1>
-          <select className="input-style" onChange={(e) => setFormData({ ...formData, status: e.target.value })}>
+          <select required className="input-style" onChange={(e) => setFormData({ ...formData, status: e.target.value })}>
             <option value="">*Select Professional Status</option>
             <option value="Junior Developer">Junior Developer</option>
             <option value="Senior Developer">Senior Developer</option>

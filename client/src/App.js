@@ -17,10 +17,17 @@ import { TokenProvider } from "./components/TokenContext";
 import Explore from "./components/Posts/Explore.";
 import ShowDeveloper from "./components/Developers/ShowDevoloper";
 import ChatWithAI from "./components/Chats/ChatWithAI";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
     <TokenProvider>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 2000,
+        }}
+      />
       <Routes>
         {/* Authntication */}
         <Route path="/" element={<Navbar />}>

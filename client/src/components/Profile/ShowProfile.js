@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useToken } from "../TokenContext";
 import { Avatar } from "@mui/material";
 import { formatDate } from "../../utils/global";
@@ -7,6 +7,7 @@ import { Tabs, Tab } from "@mui/material";
 import Post from "../Posts/Post";
 import { getMyProfile, getProfileById, GetFollowersAndFollowing } from "../../utils/APIs/profileService";
 import { GetPostsByUserId, GetPostsLikedByUser } from "../../utils/APIs/postService";
+import toast from "react-hot-toast";
 
 const ShowProfile = ({ isAnotherProfile }) => {
   const [userProfile, setUserProfile] = useState({});
@@ -40,11 +41,15 @@ const ShowProfile = ({ isAnotherProfile }) => {
           .then((data) => data)
           .catch((error) => {
             if (error.response?.status === 404) {
-              alert("You do not have a profile, please create one.");
-              navigate("/profile/edit");
+              toast.error("You do not have a profile, please create one. Redirecting to create profile after 3 seconds...");
+              setTimeout(() => {
+                navigate("/profile/edit");
+              }, 3000);
             } else {
-              alert("Failed to fetch profile. Please try again.");
-              navigate("/login");
+              toast.error("Failed to fetch profile. Please try again. Redirecting to login after 3 seconds...");
+              setTimeout(() => {
+                navigate("/login");
+              }, 3000);
             }
           });
       }
@@ -79,6 +84,12 @@ const ShowProfile = ({ isAnotherProfile }) => {
 
     const fetchAll = async () => {
       const profile = await fetchProfile();
+
+      if (!profile) {
+        setIsLoading(false);
+        return;
+      }
+
       setUserProfile(profile);
 
       const FollowsStatus = await fetchFollowersAndFollowing(profile.userId);
@@ -96,10 +107,21 @@ const ShowProfile = ({ isAnotherProfile }) => {
     };
 
     fetchAll();
+
+    return () => toast.remove();
   }, [token, decoded, navigate, value, isAnotherProfile, id]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+  };
+
+  const handleOnEditClick = () => {
+    if (decoded.name === "Guest") {
+      toast.error("You cannot edit a Guest account");
+      return;
+    }
+
+    navigate("/profile/edit");
   };
 
   if (isLoading) return <div className="text-white m-6">Loading...</div>;
@@ -114,9 +136,9 @@ const ShowProfile = ({ isAnotherProfile }) => {
           sx={{ width: 150, height: 150 }}
         />
         {!isAnotherProfile && (
-          <Link className="bg-[--primary-color] w-30 p-4 text-center text-white rounded-full hover:opacity-50" to={"/profile/edit"}>
-            Edit profile
-          </Link>
+          <button className="bg-[--primary-color] w-30 p-4 text-center text-white rounded-full hover:opacity-50" onClick={handleOnEditClick}>
+            Edit Account
+          </button>
         )}
       </div>
       <div className="text-blue-300">

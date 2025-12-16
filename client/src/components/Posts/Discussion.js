@@ -4,6 +4,7 @@ import Post from "./Post";
 import { SavePost, GetAllComments, GetPostById } from "../../utils/APIs/postService";
 import { useParams, useNavigate } from "react-router-dom";
 import { getMyProfile } from "../../utils/APIs/profileService";
+import toast from "react-hot-toast";
 
 const Discussion = () => {
   const { token, decoded } = useToken();
@@ -36,7 +37,7 @@ const Discussion = () => {
         console.log("Error in fetting comments", error.message);
         if (error === "No post found. Create the first post.") console.log("no comments for this post yet.");
         else {
-          alert("Something went wrong. Please try again.");
+          toast.error("Something went wrong. Please try again.");
         }
       }
     };
@@ -53,10 +54,10 @@ const Discussion = () => {
         .then((data) => data)
         .catch((error) => {
           if (error.response?.status === 404) {
-            alert("You do not have a profile, please create one before posting.");
+            toast.error("You do not have a profile, please create one before posting.");
             navigate("/profile/edit");
           } else {
-            alert("Failed to fetch profile. Please try again.");
+            toast.error("Failed to fetch profile. Please try again.");
             navigate("/login");
           }
         });
@@ -90,9 +91,10 @@ const Discussion = () => {
           },
         ]);
         setInputValue("");
+        toast.success("Comment posted successfully!");
       })
       .catch((error) => {
-        alert(error.message);
+        toast.error(error.message);
       });
 
     setPosting(false);

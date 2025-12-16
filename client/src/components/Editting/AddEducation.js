@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToken } from "../TokenContext";
 import { serverUrl } from "../../utils/global";
+import toast from "react-hot-toast";
 
 const AddEducation = () => {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const AddEducation = () => {
     e.preventDefault();
     console.log(formData);
     if (formData.fieldofstudy === "" || formData.school === "" || formData.degree === "") {
-      alert("School, Degree, and Field of study are required fileds");
+      toast.error("School, Degree, and Field of study are required fields");
       return;
     }
 
@@ -61,11 +62,15 @@ const AddEducation = () => {
 
       const data = await response.json();
 
-      if (response.ok) navigate("/home");
-      else alert(data.errors[0].msg);
+      if (response.ok) {
+        toast.success("Education added successfully!");
+        navigate("/home");
+      } else {
+        toast.error(data.errors[0].msg);
+      }
     } catch (error) {
       console.error("Error:", error);
-      alert("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     }
   };
 

@@ -6,6 +6,7 @@ import Post from "../Posts/Post";
 import { GetAllPosts, SavePost, GetPostsByFollowedUsers, GeneratePostWithAI } from "../../utils/APIs/postService";
 import { getMyProfile } from "../../utils/APIs/profileService";
 import { UploadImageToCloudinary } from "../../utils/APIs/imageService";
+import toast from "react-hot-toast";
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
@@ -58,10 +59,10 @@ const Posts = () => {
 
           LastPostId === 0 ? setPosts(data) : setPosts((posts) => [...posts, ...data]);
         } catch (error) {
-          alert(error.message);
+          toast.error(error.message);
           if (error.message === "Unauthorized") {
             navigate("/login");
-          }
+          } else if (error.message === "No post found.") setIsThereMorePosts(false);
         } finally {
           setIsLoading(false);
           setIsGetMorePosts(false);
@@ -84,6 +85,10 @@ const Posts = () => {
       };
       fetchPostsByFollowedUsers();
     }
+
+    return () => {
+      toast.remove();
+    };
   }, [token, navigate, value, LastPostId]);
 
   const OnPostClick = async () => {
@@ -94,10 +99,10 @@ const Posts = () => {
         .then((data) => data)
         .catch((error) => {
           if (error.response?.status === 404) {
-            alert("You do not have a profile, please create one before posting.");
+            toast.error("You do not have a profile, please create one before posting.");
             navigate("/profile/edit");
           } else {
-            alert("Failed to fetch profile. Please try again.");
+            toast.error("Failed to fetch profile. Please try again.");
             navigate("/login");
           }
         });
@@ -115,7 +120,7 @@ const Posts = () => {
         cloudURL = await UploadImageToCloudinary(imageFile);
       }
     } catch (error) {
-      alert("Image upload failed. Please try again.");
+      toast.error("Image upload failed. Please try again.");
       setPosting(false);
       return;
     }
@@ -128,24 +133,26 @@ const Posts = () => {
 
     SavePost(token, requestBody)
       .then((response) => {
-        setPosts((posts) => [
-          ...posts,
-          {
-            user: response.user,
-            name: response.name,
-            text: response.text,
-            imageURL: response.imageURL,
-            avatarURL: response.avatarURL,
-            date: response.date,
-            id: response.id,
-            likes: response.likes,
-          },
-        ]);
+        if (!isThereMorePosts)
+          setPosts((posts) => [
+            ...posts,
+            {
+              user: response.user,
+              name: response.name,
+              text: response.text,
+              imageURL: response.imageURL,
+              avatarURL: response.avatarURL,
+              date: response.date,
+              id: response.id,
+              likes: response.likes,
+            },
+          ]);
         setInputValue("");
         setImageURL(null);
+        toast.success("Post created successfully!");
       })
       .catch((error) => {
-        alert(error.message);
+        toast.error(error.message);
       });
 
     setPosting(false);
@@ -224,7 +231,7 @@ const Posts = () => {
 
                 {/* Adding poll to post */}
                 <button
-                  onClick={() => alert("Poll feature is not implemented yet.")}
+                  onClick={() => toast("Poll feature is not implemented yet.")}
                   title="Poll"
                   className="ml-2 bg-inherit border-none cursor-pointer"
                 >

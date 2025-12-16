@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { GetPostsByText } from "../../utils/APIs/postService";
 import { useToken } from "../TokenContext";
 import Post from "./Post";
+import toast from "react-hot-toast";
 
 const Explore = () => {
   const location = useLocation();
@@ -27,7 +28,7 @@ const Explore = () => {
         const data = await GetPostsByText(token, query);
         setResults(data);
       } catch (error) {
-        alert(error.message);
+        toast.error(error.message);
         setResults([]);
       } finally {
         setIsLoading(false);
